@@ -3,5 +3,5 @@ module xyz.ielis.gtram.gencode {
     requires org.slf4j;
 
     exports xyz.ielis.gtram.gencode.model;
-//    exports xyz.ielis.gtram.gencode.io;
+    exports xyz.ielis.gtram.gencode.io;
 }
