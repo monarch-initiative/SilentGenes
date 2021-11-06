@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>GTRaM</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>gtram-model</module>
+        <module>gtram-gencode</module>
+    </modules>
+
+    <groupId>xyz.ielis.gtram</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>GTRaM</name>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.1</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <spring-boot-starter.version>2.5.1</spring-boot-starter.version>
+        <svart.version>2.0.0-SNAPSHOT</svart.version>
+        <commons-compress.version>1.21</commons-compress.version>
+    </properties>
+
+    <developers>
+        <developer>
+            <name>Daniel Danis</name>
+            <email>daniel.danis@jax.org</email>
+            <organization>The Jackson Laboratory for Genomic Medicine</organization>
+            <organizationUrl>https://www.jax.org</organizationUrl>
+        </developer>
+        <developer>
+            <name>Michael Gargano</name>
+            <email>michael.gargano@jax.org</email>
+            <organization>The Jackson Laboratory for Genomic Medicine</organization>
+            <organizationUrl>https://www.jax.org</organizationUrl>
+        </developer>
+        <developer>
+            <name>Peter N Robinson</name>
+            <email>peter.robinson@jax.org</email>
+            <organization>The Jackson Laboratory for Genomic Medicine</organization>
+            <organizationUrl>https://www.jax.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:ielis/GTRaM.git</connection>
+        <developerConnection>scm:git:git@github.com:ielis/GTRaM.git</developerConnection>
+        <url>scm:git:git@github.com:ielis/GTRaM.git</url>
+        <tag>v${project.version}</tag>
+    </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.monarchinitiative.svart</groupId>
+                <artifactId>svart</artifactId>
+                <version>${svart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
