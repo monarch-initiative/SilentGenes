@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>GTRaM</artifactId>
+    <artifactId>SilentGenes</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>gtram-model</module>
-        <module>gtram-gencode</module>
+        <module>silent-genes-model</module>
+        <module>silent-genes-gencode</module>
     </modules>
 
-    <groupId>xyz.ielis.gtram</groupId>
+    <groupId>xyz.ielis.silent.genes</groupId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>GTRaM</name>
+    <name>SilentGenes</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -55,9 +55,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:ielis/GTRaM.git</connection>
-        <developerConnection>scm:git:git@github.com:ielis/GTRaM.git</developerConnection>
-        <url>scm:git:git@github.com:ielis/GTRaM.git</url>
+        <connection>scm:git:git@github.com:ielis/SilentGenes.git</connection>
+        <developerConnection>scm:git:git@github.com:ielis/SilentGenes.git</developerConnection>
+        <url>scm:git:git@github.com:ielis/SilentGenes.git</url>
         <tag>v${project.version}</tag>
     </scm>
 
