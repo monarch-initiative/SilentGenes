@@ -9,7 +9,7 @@ The project is currently in *pre-alpha* stage.
 ## Library structure
 
 *Silent genes* consists of several modules:
-- 
+
 - `silent-genes-model` defines the common properties of genes and transcripts,
 - `silent-genes-gencode` provides genes and transcripts as specified by [Gencode consortium](https://www.gencodegenes.org/),
 - `silent-genes-jannovar` provides genes and transcripts from the [Jannovar](https://github.com/charite/jannovar) transcript databases,
