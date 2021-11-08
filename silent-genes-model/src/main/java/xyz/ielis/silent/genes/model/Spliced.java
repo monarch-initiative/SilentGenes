@@ -5,6 +5,6 @@ package xyz.ielis.silent.genes.model;
  */
 public interface Spliced {
 
-    Iterable<Transcript> transcripts();
+    Iterable<? extends Transcript> transcripts();
 
 }

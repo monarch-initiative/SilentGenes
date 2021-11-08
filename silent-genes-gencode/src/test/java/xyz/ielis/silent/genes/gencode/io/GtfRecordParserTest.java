@@ -1,13 +1,16 @@
 package xyz.ielis.silent.genes.gencode.io;
 
 import org.junit.jupiter.api.Test;
+import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.Strand;
 
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 
 public class GtfRecordParserTest {
 
@@ -29,6 +32,12 @@ public class GtfRecordParserTest {
         assertThat(record.attribute("gene_name"), equalTo("MIR6859-1"));
         assertThat(record.attribute("hgnc_id"), equalTo("HGNC:50039"));
         assertThat(record.attribute("gene_name"), equalTo("MIR6859-1"));
+
+        assertThat(record.contigName(), equalTo("1"));
+        assertThat(record.strand(), equalTo(Strand.NEGATIVE));
+        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.FULLY_CLOSED));
+        assertThat(record.start(), equalTo(248_938_987));
+        assertThat(record.end(), equalTo(248_939_054));
     }
 
     @Test
@@ -38,14 +47,43 @@ public class GtfRecordParserTest {
 
         assertThat(recordOptional.isPresent(), equalTo(true));
         GtfRecord record = recordOptional.get();
+
         assertThat(record.source(), equalTo(GtfSource.HAVANA));
         assertThat(record.feature(), equalTo(GtfFeature.TRANSCRIPT));
         assertThat(record.frame(), equalTo(GtfFrame.NA));
         assertThat(record.geneId(), equalTo("ENSG00000223972.5"));
-        // TODO: 11/4/21 improve
-//        assertThat(record.getAttributes(), hasEntry("gene_type", "miRNA"));
-//        assertThat(record.getAttributes(), hasEntry("gene_name", "MIR6859-1"));
-//        assertThat(record.getAttributes(), hasEntry("hgnc_id", "HGNC:50039"));
-//        assertThat(record.getAttributes(), hasEntry("gene_name", "MIR6859-1"));
+
+        assertThat(record.contigName(), equalTo("1"));
+        assertThat(record.strand(), equalTo(Strand.POSITIVE));
+        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.FULLY_CLOSED));
+        assertThat(record.start(), equalTo(12_010));
+        assertThat(record.end(), equalTo(13_670));
+
+        assertThat(record.attribute("transcript_type"), equalTo("transcribed_unprocessed_pseudogene"));
+        assertThat(record.attribute("transcript_name"), equalTo("DDX11L1-201"));
+        assertThat(record.attribute("level"), equalTo("2"));
+    }
+
+    @Test
+    public void parse_exon() {
+        String payload = "chr1\tHAVANA\texon\t157700459\t157700585\t.\t-\t.\tgene_id \"ENSG00000160856.21\"; transcript_id \"ENST00000368184.8\"; gene_type \"protein_coding\"; gene_name \"FCRL3\"; transcript_type \"protein_coding\"; transcript_name \"FCRL3-201\"; exon_number 257; exon_id \"ENSE00003522475.1\"; level 2; protein_id \"ENSP00000357167.3\"; transcript_support_level \"1\"; hgnc_id \"HGNC:18506\"; tag \"alternative_3_UTR\"; tag \"basic\"; tag \"Ensembl_canonical\"; tag \"MANE_Select\"; tag \"appris_principal_2\"; tag \"CCDS\"; ccdsid \"CCDS1167.1\"; havana_gene \"OTTHUMG00000019400.9\"; havana_transcript \"OTTHUMT00000051419.3\";";
+        Optional<GtfRecord> recordOptional = GtfRecordParser.parseLine(payload, ASSEMBLY);
+
+        assertThat(recordOptional.isPresent(), equalTo(true));
+        GtfRecord record = recordOptional.get();
+
+        assertThat(record.source(), equalTo(GtfSource.HAVANA));
+        assertThat(record.feature(), equalTo(GtfFeature.EXON));
+        assertThat(record.frame(), equalTo(GtfFrame.NA));
+        assertThat(record.geneId(), equalTo("ENSG00000160856.21"));
+
+        assertThat(record.contigName(), equalTo("1"));
+        assertThat(record.strand(), equalTo(Strand.NEGATIVE));
+        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.FULLY_CLOSED));
+        assertThat(record.start(), equalTo(91_255_838));
+        assertThat(record.end(), equalTo(91_255_964));
+
+        assertThat(record.attribute("transcript_id"), equalTo("ENST00000368184.8"));
+        assertThat(record.attribute("exon_number"), equalTo("257"));
     }
 }

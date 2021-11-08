@@ -1,43 +1,50 @@
-package xyz.ielis.silent.genes.gencode.model;
+package xyz.ielis.silent.genes.gencode.impl;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
+import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.model.Coding;
+import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
 import java.util.List;
 import java.util.Objects;
 
-// TODO - does this have to be public?
 public class CodingTranscript extends BaseTranscript implements Coding {
 
     private final Coordinates startCodon;
     private final Coordinates stopCodon;
 
     private CodingTranscript(GenomicRegion location,
+                             TranscriptIdentifier id,
                              Coordinates startCodon,
                              Coordinates stopCodon,
-                             String id,
                              String type,
-                             Status status,
-                             String name,
                              EvidenceLevel evidenceLevel,
                              List<Coordinates> exons) {
-        super(location, id, type, status, name, evidenceLevel, exons);
+        super(location, id, type, evidenceLevel, exons);
         this.startCodon = startCodon;
         this.stopCodon = stopCodon;
     }
 
     public static CodingTranscript of(GenomicRegion location,
+                                      TranscriptIdentifier id,
                                       Coordinates startCodon,
                                       Coordinates stopCodon,
-                                      String id,
                                       String type,
-                                      Status status,
-                                      String name,
                                       EvidenceLevel evidenceLevel,
                                       List<Coordinates> exons) {
-        // TODO - null checks
-        return new CodingTranscript(location, startCodon, stopCodon, id, type, status, name, evidenceLevel, exons);
+        Objects.requireNonNull(location, "Location must not be null");
+        Objects.requireNonNull(startCodon, "Start codon must not be null");
+        Objects.requireNonNull(stopCodon, "Stop codon must not be null");
+        Objects.requireNonNull(id, "ID must not be null");
+        Objects.requireNonNull(type, "Type must not be null");
+        Objects.requireNonNull(evidenceLevel, "Evidence level must not be null");
+        Objects.requireNonNull(exons, "Exons must not be null");
+        if (exons.isEmpty()) {
+            throw new IllegalArgumentException("Exon list must not be empty");
+        }
+
+        return new CodingTranscript(location, id, startCodon, stopCodon, type, evidenceLevel, exons);
     }
 
     @Override

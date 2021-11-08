@@ -12,9 +12,7 @@ import java.util.List;
  * The implementors must ensure that the exons are arranged in ascending order and the exons do not overlap.
  * </ul>
  */
-public interface Transcript extends Located {
-
-    // TODO - add identifiers
+public interface Transcript extends Located, Identified<TranscriptIdentifier> {
 
     List<Coordinates> exons();
 
