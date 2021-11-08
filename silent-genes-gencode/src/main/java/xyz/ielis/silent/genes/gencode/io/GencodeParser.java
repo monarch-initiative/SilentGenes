@@ -24,7 +24,7 @@ public class GencodeParser implements Iterable<GencodeGene> {
         return new GeneIterator(gencodeGtfPath, genomicAssembly);
     }
 
-    Stream<GencodeGene> stream() {
+    public Stream<GencodeGene> stream() {
         Spliterator<GencodeGene> spliterator = Spliterators.spliteratorUnknownSize(iterator(), Spliterator.IMMUTABLE);
         return StreamSupport.stream(spliterator, false);
     }
