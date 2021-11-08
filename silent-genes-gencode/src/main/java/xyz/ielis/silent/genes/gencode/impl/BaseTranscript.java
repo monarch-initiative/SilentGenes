@@ -1,7 +1,10 @@
-package xyz.ielis.silent.genes.gencode.model;
+package xyz.ielis.silent.genes.gencode.impl;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
+import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
+import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
+import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
 import java.util.List;
 import java.util.Objects;
@@ -9,25 +12,19 @@ import java.util.Objects;
 abstract class BaseTranscript implements GencodeTranscript {
 
     private final GenomicRegion location;
-    private final String id;
+    private final TranscriptIdentifier id;
     private final String type;
-    private final Status status;
-    private final String name;
     private final EvidenceLevel evidenceLevel;
     private final List<Coordinates> exons;
 
     protected BaseTranscript(GenomicRegion location,
-                             String id,
+                             TranscriptIdentifier id,
                              String type,
-                             Status status,
-                             String name,
                              EvidenceLevel evidenceLevel,
                              List<Coordinates> exons) {
         this.location = location;
         this.id = id;
         this.type = type;
-        this.status = status;
-        this.name = name;
         this.evidenceLevel = evidenceLevel;
         this.exons = exons;
     }
@@ -39,23 +36,13 @@ abstract class BaseTranscript implements GencodeTranscript {
     }
 
     @Override
-    public String id() {
+    public TranscriptIdentifier id() {
         return id;
     }
 
     @Override
     public String type() {
         return type;
-    }
-
-    @Override
-    public Status status() {
-        return status;
-    }
-
-    @Override
-    public String name() {
-        return name;
     }
 
     @Override
@@ -73,12 +60,12 @@ abstract class BaseTranscript implements GencodeTranscript {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BaseTranscript that = (BaseTranscript) o;
-        return Objects.equals(location, that.location) && Objects.equals(id, that.id) && Objects.equals(type, that.type) && status == that.status && Objects.equals(name, that.name) && evidenceLevel == that.evidenceLevel && Objects.equals(exons, that.exons);
+        return Objects.equals(location, that.location) && Objects.equals(id, that.id) && Objects.equals(type, that.type) && evidenceLevel == that.evidenceLevel && Objects.equals(exons, that.exons);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(location, id, type, status, name, evidenceLevel, exons);
+        return Objects.hash(location, id, type, evidenceLevel, exons);
     }
 
     @Override
@@ -87,8 +74,6 @@ abstract class BaseTranscript implements GencodeTranscript {
                 "location=" + location +
                 ", id='" + id + '\'' +
                 ", type='" + type + '\'' +
-                ", status=" + status +
-                ", name='" + name + '\'' +
                 ", evidenceLevel=" + evidenceLevel +
                 ", exons=" + exons +
                 '}';

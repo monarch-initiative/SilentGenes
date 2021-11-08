@@ -4,6 +4,10 @@ import org.monarchinitiative.svart.GenomicAssembly;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
 
 import java.nio.file.Path;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class GencodeParser implements Iterable<GencodeGene> {
 
@@ -20,4 +24,8 @@ public class GencodeParser implements Iterable<GencodeGene> {
         return new GeneIterator(gencodeGtfPath, genomicAssembly);
     }
 
+    public Stream<GencodeGene> stream() {
+        Spliterator<GencodeGene> spliterator = Spliterators.spliteratorUnknownSize(iterator(), Spliterator.IMMUTABLE);
+        return StreamSupport.stream(spliterator, false);
+    }
 }

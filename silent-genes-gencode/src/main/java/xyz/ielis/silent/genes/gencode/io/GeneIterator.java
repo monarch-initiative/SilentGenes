@@ -4,8 +4,14 @@ import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.ielis.silent.genes.gencode.impl.CodingTranscript;
+import xyz.ielis.silent.genes.gencode.impl.GencodeGeneImpl;
+import xyz.ielis.silent.genes.gencode.impl.NoncodingTranscript;
+import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
 import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
+import xyz.ielis.silent.genes.model.GeneIdentifier;
+import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -17,6 +23,14 @@ import java.util.zip.GZIPInputStream;
 public class GeneIterator implements Iterator<GencodeGene>, Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneIterator.class);
+
+    // These are required attributes for gene and transcript record. Any record lacking one or more attribute is skipped
+    // and the warning is logged.
+    // Note that `gene_id` is mandatory argument and the GTF lines lacking the `gene_id` do
+    // not make it into `GtfRecord`.
+    private static final Set<String> MANDATORY_GENE_ATTRIBUTE_NAMES = Set.of("gene_type", "gene_name", "level");
+    private static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES = Set.of("transcript_id", "transcript_type", "transcript_name", "level");
+    private static final Set<String> MANDATORY_EXON_ATTRIBUTE_NAMES = Set.of("transcript_id", "exon_id", "exon_number");
 
     private final GenomicAssembly genomicAssembly;
     private final Queue<GencodeGene> queue = new LinkedList<>();
@@ -30,7 +44,7 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
             reader = openForReading(gencodeGtfPath);
             readNextContig();
         } catch (IOException e) {
-            LOGGER.warn("Error opening GTF at `{}`", gencodeGtfPath);
+            LOGGER.warn("Error opening GTF at `{}`: {}", gencodeGtfPath, e.getMessage());
         }
     }
 
@@ -46,7 +60,6 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
     }
 
     private static Optional<GencodeGene> assembleGene(String geneId, List<GtfRecord> records) {
-        // TODO: 11/5/21 continue
         GtfRecord gene = null;
         List<GtfRecord> transcripts = new LinkedList<>();
         Map<String, List<GtfRecord>> exons = new HashMap<>();
@@ -60,31 +73,19 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
                         LOGGER.warn("2nd gene record was seen for gene {}: `{}`", geneId, record);
                         return Optional.empty();
                     }
-                    // the gene record must have `hgnc_id` and `gene_name` attributes
-                    if (!record.hasAttribute("hgnc_id")) {
-                        LOGGER.warn("Skipping gene {} that lacks HGNC ID: `{}`", geneId, record);
-                        return Optional.empty();
-                    }
-                    if (!record.hasAttribute("gene_name")) {
-                        LOGGER.warn("Skipping gene {} that lacks gene name: `{}`", geneId, record);
-                        return Optional.empty();
-                    }
                     gene = record;
                     break;
                 case TRANSCRIPT:
-                    String txTxId = record.attribute("transcript_id");
-                    if (txTxId == null) {
-                        LOGGER.warn("Missing `transcript_id` in transcript record for {}: `{}`", geneId, record);
-                        break;
+                    if (!record.attributes().containsAll(MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES)) {
+                        return reportMissingAttributesAndReturn(record, MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES);
                     }
                     transcripts.add(record);
                     break;
                 case EXON:
-                    String exonTxId = record.attribute("transcript_id");
-                    if (exonTxId == null) {
-                        LOGGER.warn("Missing `transcript_id` in exon record for {}: `{}`", geneId, record);
-                        break;
+                    if (!record.attributes().containsAll(MANDATORY_EXON_ATTRIBUTE_NAMES)) {
+                        return reportMissingAttributesAndReturn(record, MANDATORY_EXON_ATTRIBUTE_NAMES);
                     }
+                    String exonTxId = record.attribute("transcript_id");
                     exons.putIfAbsent(exonTxId, new ArrayList<>());
                     exons.get(exonTxId).add(record);
                     break;
@@ -114,68 +115,84 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
             return Optional.empty();
         }
 
-//        GeneDefault.Builder builder = GeneDefault.builder()
-//                // the attributes are present (checked above)
-//                .geneSymbol(gene.attribute("gene_name"))
-//                .accessionId(TermId.of(gene.attribute("hgnc_id")));
-//
-//        List<Transcript> txs = new ArrayList<>(transcripts.size());
-//        for (GtfRecord txRecord : transcripts) {
-//            String txId = txRecord.attribute("transcript_id"); // the attribute is present (checked above)
-//            List<GtfRecord> txExons = exons.get(txId);
-//            GtfRecord startCodon = startCodons.get(txId);
-//            GtfRecord stopCodon = stopCodons.get(txId);
-//            Optional<Transcript> transcript = processTranscript(txId, txRecord, txExons, startCodon, stopCodon);
-//            transcript.ifPresent(txs::add);
-//        }
-//        if (txs.isEmpty()) {
-//            LOGGER.warn("No transcripts could be parsed for gene `{}`", geneId);
-//            return Optional.empty();
-//        }
+        // id, type, status, name
+        if (!gene.attributes().containsAll(MANDATORY_GENE_ATTRIBUTE_NAMES)) {
+            return reportMissingAttributesAndReturn(gene, MANDATORY_GENE_ATTRIBUTE_NAMES);
+        }
 
-//        return Optional.of(builder.addAllTranscripts(txs).build());
-        return Optional.empty();
+
+        String hgncId = gene.attribute("hgnc_id");
+        GeneIdentifier geneIdentifier = GeneIdentifier.of(geneId, gene.attribute("gene_name"), hgncId);
+        String type = gene.attribute("gene_type");
+
+        Optional<EvidenceLevel> evidenceLevel = parseEvidenceLevel(gene.attribute("level"));
+        if (evidenceLevel.isEmpty()) {
+            LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", gene.attribute("level"), geneId);
+            return Optional.empty();
+        }
+
+
+        List<GencodeTranscript> txs = new ArrayList<>(transcripts.size());
+        for (GtfRecord txRecord : transcripts) {
+            String txId = txRecord.attribute("transcript_id"); // the attribute is present (checked above)
+            List<GtfRecord> txExons = exons.get(txId);
+            GtfRecord startCodon = startCodons.get(txId);
+            GtfRecord stopCodon = stopCodons.get(txId);
+            Optional<GencodeTranscript> transcript = processTranscript(txId, txRecord, txExons, startCodon, stopCodon);
+            transcript.ifPresent(txs::add);
+        }
+        if (txs.isEmpty()) {
+            LOGGER.warn("No transcripts could be parsed for gene `{}`", geneId);
+            return Optional.empty();
+        }
+
+        return Optional.of(GencodeGeneImpl.of(gene.location(), geneIdentifier, type, evidenceLevel.get(), txs));
     }
 
     private static Optional<GencodeTranscript> processTranscript(String txId,
                                                                  GtfRecord tx,
-                                                                 List<GtfRecord> exons,
+                                                                 List<GtfRecord> exonRecords,
                                                                  GtfRecord startCodon,
                                                                  GtfRecord stopCodon) {
+        Optional<EvidenceLevel> level = parseEvidenceLevel(tx.attribute("level"));
+        if (level.isEmpty()) {
+            LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", tx.attribute("level"), txId);
+            return Optional.empty();
+        }
+
+        String type = tx.attribute("transcript_type");
+        TranscriptIdentifier txIdentifier = TranscriptIdentifier.of(txId, tx.attribute("transcript_name"), tx.attribute("ccdsid"));
+        List<Coordinates> exons = processExons(exonRecords);
+
         if (startCodon == null && stopCodon == null) {
             // should be non-coding transcript
-            return processNoncodingTranscript(txId, tx, exons);
+            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, type, level.get(), exons));
         } else {
             // should be coding transcript
             if (startCodon == null || stopCodon == null) {
-                LOGGER.warn("Start codon or stop codon are missing for transcript `{}`", txId);
+                if (startCodon == null) {
+                    LOGGER.warn("Start codon is missing for transcript `{}`: {}", txId, tx);
+                } else {
+                    LOGGER.warn("Stop codon is missing for transcript `{}`: {}", txId, tx);
+                }
                 return Optional.empty();
+            } else {
+                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), type, level.get(), exons));
             }
-
-            return processCodingTranscript(txId, tx, exons, startCodon.coordinates(), stopCodon.coordinates());
         }
     }
 
-    private static Optional<GencodeTranscript> processNoncodingTranscript(String txId,
-                                                                   GtfRecord tx,
-                                                                   List<GtfRecord> exonRecords) {
-        List<Coordinates> exons = processExons(exonRecords);
-//        Transcript transcript = Transcript.noncoding(tx.contig(), tx.strand(), tx.coordinateSystem(), tx.start(), tx.end(), txId, exons);
-//        return Optional.of(transcript);
-        return Optional.empty();
-    }
-
-    private static Optional<GencodeTranscript> processCodingTranscript(String txId,
-                                                                GtfRecord tx,
-                                                                List<GtfRecord> exonRecords,
-                                                                Coordinates startCodon,
-                                                                Coordinates stopCodon) {
-        List<Coordinates> exons = processExons(exonRecords);
-        int cdsStart = startCodon.startWithCoordinateSystem(tx.coordinateSystem());
-        int cdsEnd = stopCodon.endWithCoordinateSystem(tx.coordinateSystem()) - stopCodon.length(); // stop codon is NOT part of the CDS!
-//        CodingTranscript transcript = CodingTranscript.of(tx.contig(), tx.strand(), tx.coordinateSystem(), tx.start(), tx.end(), txId, exons, cdsStart, cdsEnd);
-//        return Optional.of(transcript);
-        return Optional.empty();
+    private static Optional<EvidenceLevel> parseEvidenceLevel(String level) {
+        switch (level) {
+            case "1":
+                return Optional.of(EvidenceLevel.VERIFIED);
+            case "2":
+                return Optional.of(EvidenceLevel.MANUALLY_ANNOTATED);
+            case "3":
+                return Optional.of(EvidenceLevel.AUTOMATICALLY_ANNOTATED);
+            default:
+                return Optional.empty();
+        }
     }
 
     private static List<Coordinates> processExons(List<GtfRecord> exonRecords) {
@@ -188,6 +205,19 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
         }
 
         return Arrays.asList(exons);
+    }
+
+    private static <T> Optional<T> reportMissingAttributesAndReturn(GtfRecord record,
+                                                                    Set<String> mandatoryGeneAttributeNames) {
+        List<String> missingAttributes = new ArrayList<>(mandatoryGeneAttributeNames.size());
+        for (String attribute : mandatoryGeneAttributeNames) {
+            if (!record.hasAttribute(attribute)) {
+                missingAttributes.add(attribute);
+            }
+        }
+        String missing = missingAttributes.stream().collect(Collectors.joining("`, `", "`", "`"));
+        LOGGER.warn("Missing required attributes {} in record `{}`", missing, record);
+        return Optional.empty();
     }
 
     @Override
@@ -204,32 +234,35 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
     }
 
     /**
-     * Read GTF content and
+     * Transform the lines of records located on the next contig into {@link GtfRecord}s, and convert the records
+     * to {@link GencodeGene}s.
      */
     private void readNextContig() {
         List<GtfRecord> contigRecords = readContigRecords();
-        processRecordsToGenes(contigRecords);
+        List<GencodeGene> genes = processRecordsToGenes(contigRecords);
+        queue.addAll(genes);
     }
 
-    private void processRecordsToGenes(List<GtfRecord> contigRecords) {
+    private List<GencodeGene> processRecordsToGenes(List<GtfRecord> contigRecords) {
         Map<String, List<GtfRecord>> recordByGeneId = contigRecords.stream()
-                .collect(Collectors.groupingBy(GtfRecord::geneId));
+                .collect(Collectors.groupingBy(GtfRecord::geneId, Collectors.toUnmodifiableList()));
 
-        List<GencodeGene> genes = recordByGeneId.entrySet().stream()
+        return recordByGeneId.entrySet().stream()
                 .map(e -> assembleGene(e.getKey(), e.getValue()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toUnmodifiableList());
-
-        queue.addAll(genes);
     }
 
     private List<GtfRecord> readContigRecords() {
         List<GtfRecord> contigRecords = new ArrayList<>();
         try {
-            if (firstRecordOfNextContig != null)
-                // the first record is null before we're processing the first contig
+            if (firstRecordOfNextContig != null) {
+                // the first record is null before we process the first contig
                 contigRecords.add(firstRecordOfNextContig);
+                // set to null so that the last row is not added into the contigRecords list after processing all contigs
+                firstRecordOfNextContig = null;
+            }
 
             String line;
             while ((line = reader.readLine()) != null) {

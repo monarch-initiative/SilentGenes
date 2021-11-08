@@ -1,9 +1,6 @@
 package xyz.ielis.silent.genes.model;
 
-import org.monarchinitiative.svart.Contig;
-import org.monarchinitiative.svart.CoordinateSystem;
-import org.monarchinitiative.svart.GenomicRegion;
-import org.monarchinitiative.svart.Strand;
+import org.monarchinitiative.svart.*;
 
 /**
  * The interface to represent entities that are located in the reference genome.
@@ -46,5 +43,8 @@ public interface Located {
         return location().endWithCoordinateSystem(target);
     }
 
+    default Coordinates coordinates() {
+        return location().coordinates();
+    }
 
 }

@@ -18,8 +18,8 @@ public interface Coding {
     Coordinates stopCodon();
 
     default int cdsLength() {
-        if (this instanceof Spliced) {
-            return cdsLength(startCodon(), stopCodon(), ((Spliced) this).exons());
+        if (this instanceof Transcript) {
+            return cdsLength(startCodon(), stopCodon(), ((Transcript) this).exons());
         } else {
             return stopCodon().endWithCoordinateSystem(CoordinateSystem.zeroBased())
                     - startCodon().startWithCoordinateSystem(CoordinateSystem.zeroBased())

@@ -14,7 +14,6 @@ class GtfRecordParser {
 
     static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.oneBased(); // GTF invariant
     private static final Logger LOGGER = LoggerFactory.getLogger(GtfRecordParser.class);
-    private static final Pattern GENE_ID_PATTERN = Pattern.compile("gene_id\\s*\"(?<value>ENSG\\d{11}\\.\\d+(_PAR_Y)?)\"");
     private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("(?<key>[\\w_]+)\\s*(?<value>[\\w\\d_:./\\-\"]+)");
     // max number of fields in the GTF file used to develop this parser. A good default capacity for the attribute map
     private static final int N_ATTRIBUTE_FIELDS = 26;
@@ -25,146 +24,135 @@ class GtfRecordParser {
 
     static Optional<GtfRecord> parseLine(String line, GenomicAssembly assembly) {
         String[] token = line.split("\t");
-        // contig
-        Contig contig = assembly.contigByName(token[0]);
-        if (contig.isUnknown()) {
-            LOGGER.warn("Skipping a line with unknown contig `{}`: `{}`", token[0], line);
+        try {
+            GenomicRegion location = parseLocation(assembly, token[0], token[6], token[3], token[4]);
+            GtfSource source = parseSource(token[1]);
+            GtfFeature feature = parseFeature(token[2]);
+            GtfFrame frame = parseFrame(token[7]);
+            Map<String, String> attributes = parseAttributes(token[8]);
+
+            return Optional.of(GtfRecord.of(location, source, feature, frame, attributes));
+        } catch (GtfParseException e) {
+            LOGGER.warn("{}. Line {}", e.getMessage(), line);
             return Optional.empty();
         }
-
-        // strand & coordinate system
-        Optional<Strand> strand = parseStrand(token[6]);
-        if (strand.isEmpty()) return Optional.empty();
-        Optional<Coordinates> coordinates = parseCoordinates(contig, strand.get(), token[3], token[4]);
-        if (coordinates.isEmpty()) return Optional.empty();
-
-        // source, feature, frame
-        Optional<GtfSource> source = parseSource(token[1]);
-        if (source.isEmpty()) return Optional.empty();
-
-        Optional<GtfFeature> feature = parseFeature(token[2]);
-        if (feature.isEmpty()) return Optional.empty();
-
-        Optional<GtfFrame> frame = parseFrame(token[7]);
-        if (frame.isEmpty()) return Optional.empty();
-
-        Optional<String> geneId = parseGeneId(token[8]);
-        if (geneId.isEmpty()) return Optional.empty();
-
-        Map<String, String> attributes = parseAttributes(token[8]);
-        return Optional.of(GtfRecord.of(contig, strand.get(), coordinates.get(), source.get(), feature.get(), frame.get(), geneId.get(), attributes));
     }
 
-    private static Optional<GtfFrame> parseFrame(String payload) {
+    private static GenomicRegion parseLocation(GenomicAssembly assembly,
+                                               String contigName,
+                                               String strandValue,
+                                               String start,
+                                               String end) throws GtfParseException {
+        // Parse contig, strand & coordinate system
+        Contig contig = assembly.contigByName(contigName);
+        if (contig.isUnknown())
+            throw new GtfParseException("Unknown contig `" + contigName + '`');
+
+        Strand strand = parseStrand(strandValue);
+        Coordinates coordinates = parseCoordinates(contig, strand, start, end);
+
+        return GenomicRegion.of(contig, strand, coordinates);
+    }
+
+    private static GtfFrame parseFrame(String payload) throws GtfParseException {
         switch (payload) {
             case ".":
-                return Optional.of(GtfFrame.NA);
+                return GtfFrame.NA;
             case "0":
-                return Optional.of(GtfFrame.ZERO);
+                return GtfFrame.ZERO;
             case "1":
-                return Optional.of(GtfFrame.ONE);
+                return GtfFrame.ONE;
             case "2":
-                return Optional.of(GtfFrame.TWO);
+                return GtfFrame.TWO;
             default:
-                LOGGER.warn("Unknown GTF frame: `{}`", payload);
-                return Optional.empty();
+                throw new GtfParseException(String.format("Unknown GTF frame: `%s`", payload));
         }
     }
 
-    private static Optional<Strand> parseStrand(String strand) {
+    private static Strand parseStrand(String strand) throws GtfParseException {
         switch (strand) {
             case "+":
-                return Optional.of(Strand.POSITIVE);
+                return Strand.POSITIVE;
             case "-":
-                return Optional.of(Strand.NEGATIVE);
+                return Strand.NEGATIVE;
             default:
-                LOGGER.warn("Unknown strand " + strand);
-                return Optional.empty();
+                throw new GtfParseException("Unknown strand `" + strand + '`');
         }
     }
 
-    private static Optional<Coordinates> parseCoordinates(Contig contig, Strand strand, String startPos, String endPos) {
+    private static Coordinates parseCoordinates(Contig contig, Strand strand, String startPos, String endPos) throws GtfParseException {
         // GTF provides coordinates on POSITIVE strand even if the actual strand of the feature is negative.
         // We must adjust the coordinates to strand and contig.
         try {
             int start = Integer.parseInt(startPos);
             int end = Integer.parseInt(endPos);
             if (strand.isPositive()) {
-                return Optional.of(Coordinates.of(COORDINATE_SYSTEM, start, end));
+                return Coordinates.of(COORDINATE_SYSTEM, start, end);
             } else {
                 int startOnNegative = Coordinates.invertPosition(COORDINATE_SYSTEM, contig, end);
                 int endOnNegative = Coordinates.invertPosition(COORDINATE_SYSTEM, contig, start);
-                return Optional.of(Coordinates.of(COORDINATE_SYSTEM, startOnNegative, endOnNegative));
+                return Coordinates.of(COORDINATE_SYSTEM, startOnNegative, endOnNegative);
             }
         } catch (NumberFormatException e) {
-            LOGGER.warn("Error parsing GTF coordinates. Start: `" + startPos + "`, end: `" + endPos + "`");
-            return Optional.empty();
+            throw new GtfParseException("Unparsable coordinates: start=" + startPos + ", end=" + endPos);
         }
     }
 
-    private static Optional<GtfSource> parseSource(String payload) {
+    private static GtfSource parseSource(String payload) throws GtfParseException {
         switch (payload) {
             case "ENSEMBL":
-                return Optional.of(GtfSource.ENSEMBL);
+                return GtfSource.ENSEMBL;
             case "HAVANA":
-                return Optional.of(GtfSource.HAVANA);
+                return GtfSource.HAVANA;
             default:
-                LOGGER.warn("Unknown GTF record source: `{}`", payload);
-                return Optional.empty();
+                throw new GtfParseException(String.format("Unknown GTF record source: `%s`", payload));
         }
     }
 
-    private static Optional<GtfFeature> parseFeature(String payload) {
+    private static GtfFeature parseFeature(String payload) throws GtfParseException {
         switch (payload) {
             case "exon":
-                return Optional.of(GtfFeature.EXON);
+                return GtfFeature.EXON;
             case "CDS":
-                return Optional.of(GtfFeature.CDS);
+                return GtfFeature.CDS;
             case "UTR":
-                return Optional.of(GtfFeature.UTR);
+                return GtfFeature.UTR;
             case "transcript":
-                return Optional.of(GtfFeature.TRANSCRIPT);
+                return GtfFeature.TRANSCRIPT;
             case "start_codon":
-                return Optional.of(GtfFeature.START_CODON);
+                return GtfFeature.START_CODON;
             case "stop_codon":
-                return Optional.of(GtfFeature.STOP_CODON);
+                return GtfFeature.STOP_CODON;
             case "gene":
-                return Optional.of(GtfFeature.GENE);
+                return GtfFeature.GENE;
             case "Selenocysteine":
-                return Optional.of(GtfFeature.SELENOCYSTEINE);
+                return GtfFeature.SELENOCYSTEINE;
             default:
-                LOGGER.warn("Unknown GTF feature type: `{}`", payload);
-                return Optional.empty();
+                throw new GtfParseException(String.format("Unknown GTF feature type: `%s`", payload));
         }
     }
 
-    private static Optional<String> parseGeneId(String payload) {
-        Matcher matcher = GENE_ID_PATTERN.matcher(payload);
-        if (matcher.find()) {
-            return Optional.ofNullable(matcher.group("value"));
-        }
-        return Optional.empty();
-    }
-
-    private static Map<String, String> parseAttributes(String payload) {
-        Map<String, String> attributeMap = new HashMap<>(N_ATTRIBUTE_FIELDS);
+    private static Map<String, String> parseAttributes(String payload) throws GtfParseException {
+        Map<String, String> attributes = new HashMap<>(N_ATTRIBUTE_FIELDS);
         Matcher matcher = ATTRIBUTE_PATTERN.matcher(payload);
         while (matcher.find()) {
             String key = matcher.group("key");
-            if ("gene_id".equals(key)) continue; // we store the gene_id elsewhere
             String value = matcher.group("value");
             if (value.startsWith("\"") && value.endsWith("\"")) {
-                try {
-                    attributeMap.put(key, value.substring(1, value.length() - 1));
-                } catch (StringIndexOutOfBoundsException e) {
-                    System.err.println("Whoops: " + payload);
-                    throw e;
-                }
+                // some attribute values are enclosed in double quotes
+                String strippedQuotes = value.substring(1, value.length() - 1);
+                attributes.put(key, strippedQuotes);
             } else {
-                attributeMap.put(key, value);
+                // others are not
+                attributes.put(key, value);
             }
         }
-        return attributeMap;
+
+        if (!attributes.containsKey("gene_id")) {
+            throw new GtfParseException("The mandatory `gene_id` attribute is missing");
+        }
+
+        return attributes;
     }
 
 }
