@@ -1,5 +1,6 @@
 package xyz.ielis.silent.genes.gencode.io;
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
 
 public class GeneIterator implements Iterator<GencodeGene>, Closeable {
 
@@ -52,7 +52,7 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
         LOGGER.debug("Opening Gencode GTF file at `{}`", path.toAbsolutePath());
         if (path.toFile().getName().endsWith(".gz")) {
             LOGGER.debug("Assuming the file is GZipped");
-            return new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(path.toFile()))));
+            return new BufferedReader(new InputStreamReader(new GzipCompressorInputStream(new FileInputStream(path.toFile()))));
         } else {
             LOGGER.debug("Opening GTF as a plain text");
             return Files.newBufferedReader(path);
