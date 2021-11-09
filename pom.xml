@@ -8,6 +8,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>silent-genes-model</module>
+        <module>silent-genes-simple</module>
+        <module>silent-genes-io</module>
         <module>silent-genes-gencode</module>
     </modules>
 

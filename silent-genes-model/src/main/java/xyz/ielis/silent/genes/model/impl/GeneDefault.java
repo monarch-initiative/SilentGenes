@@ -5,6 +5,7 @@ import xyz.ielis.silent.genes.model.Gene;
 import xyz.ielis.silent.genes.model.GeneIdentifier;
 import xyz.ielis.silent.genes.model.Transcript;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,10 +17,12 @@ public class GeneDefault implements Gene {
 
     public GeneDefault(GeneIdentifier id,
                        GenomicRegion location,
-                       Set<? extends Transcript> transcripts) {
-        this.id = id;
-        this.location = location;
-        this.transcripts = transcripts;
+                       Collection<? extends Transcript> transcripts) {
+        this.id = Objects.requireNonNull(id, "ID must not be null");
+        this.location = Objects.requireNonNull(location, "Location must not be null");
+        this.transcripts = Set.copyOf(Objects.requireNonNull(transcripts, "Transcripts must not be null"));
+        if (this.transcripts.isEmpty())
+            throw new IllegalArgumentException("Transcripts must not be empty");
     }
 
     @Override
