@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class TranscriptIdentifierDeserializer extends StdDeserializer<TranscriptIdentifier> {
 
+    private static final long serialVersionUID = 1L;
+
     public TranscriptIdentifierDeserializer() {
         this(TranscriptIdentifier.class);
     }

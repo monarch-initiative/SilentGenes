@@ -9,6 +9,8 @@ import java.io.IOException;
 
 public class TranscriptIdentifierSerializer extends StdSerializer<TranscriptIdentifier> {
 
+    private static final long serialVersionUID = 1L;
+
     public TranscriptIdentifierSerializer() {
         this(TranscriptIdentifier.class);
     }

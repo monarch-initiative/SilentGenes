@@ -17,6 +17,8 @@ import java.util.List;
 
 public class TranscriptDeserializer extends StdDeserializer<Transcript> {
 
+    private static final long serialVersionUID = 1L;
+
     public TranscriptDeserializer() {
         this(Transcript.class);
     }

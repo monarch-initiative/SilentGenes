@@ -17,6 +17,8 @@ import java.util.List;
 
 public class GeneDeserializer extends StdDeserializer<Gene> {
 
+    private static final long serialVersionUID = 1L;
+
     public GeneDeserializer() {
         this(Gene.class);
     }
