@@ -8,6 +8,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>silent-genes-model</module>
+        <module>silent-genes-simple</module>
+        <module>silent-genes-io</module>
         <module>silent-genes-gencode</module>
     </modules>
 
@@ -18,7 +20,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.1</version>
+        <version>2.5.5</version>
     </parent>
 
     <properties>
@@ -28,7 +30,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <spring-boot-starter.version>2.5.1</spring-boot-starter.version>
+        <spring-boot-starter.version>2.5.5</spring-boot-starter.version>
         <svart.version>2.0.0-SNAPSHOT</svart.version>
         <commons-compress.version>1.21</commons-compress.version>
     </properties>

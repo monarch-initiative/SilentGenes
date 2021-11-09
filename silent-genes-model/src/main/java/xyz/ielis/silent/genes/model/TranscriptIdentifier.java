@@ -1,5 +1,7 @@
 package xyz.ielis.silent.genes.model;
 
+import xyz.ielis.silent.genes.model.impl.TranscriptIdentifierDefault;
+
 import java.util.Optional;
 
 public interface TranscriptIdentifier extends Identifier {

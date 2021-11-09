@@ -1,6 +1,9 @@
 package xyz.ielis.silent.genes.model;
 
 import org.monarchinitiative.svart.Coordinates;
+import org.monarchinitiative.svart.GenomicRegion;
+import xyz.ielis.silent.genes.model.impl.CodingTranscript;
+import xyz.ielis.silent.genes.model.impl.TranscriptDefault;
 
 import java.util.List;
 
@@ -13,6 +16,20 @@ import java.util.List;
  * </ul>
  */
 public interface Transcript extends Located, Identified<TranscriptIdentifier> {
+
+    static Transcript noncoding(TranscriptIdentifier id,
+                                GenomicRegion location,
+                                List<Coordinates> exons) {
+        return TranscriptDefault.of(id, location, exons);
+    }
+
+    static Transcript coding(TranscriptIdentifier id,
+                             GenomicRegion location,
+                             List<Coordinates> exons,
+                             Coordinates startCodon,
+                             Coordinates stopCodon) {
+        return CodingTranscript.of(id, location, exons, startCodon, stopCodon);
+    }
 
     List<Coordinates> exons();
 

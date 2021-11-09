@@ -1,5 +1,7 @@
 package xyz.ielis.silent.genes.model;
 
+import xyz.ielis.silent.genes.model.impl.GeneIdentifierDefault;
+
 import java.util.Optional;
 
 public interface GeneIdentifier extends Identifier {
