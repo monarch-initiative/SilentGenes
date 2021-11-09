@@ -1,4 +1,6 @@
-package xyz.ielis.silent.genes.model;
+package xyz.ielis.silent.genes.model.impl;
+
+import xyz.ielis.silent.genes.model.Identifier;
 
 import java.util.Objects;
 

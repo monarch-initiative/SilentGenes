@@ -1,13 +1,15 @@
-package xyz.ielis.silent.genes.model;
+package xyz.ielis.silent.genes.model.impl;
+
+import xyz.ielis.silent.genes.model.GeneIdentifier;
 
 import java.util.Objects;
 import java.util.Optional;
 
-class GeneIdentifierDefault extends IdentifierDefault implements GeneIdentifier {
+public class GeneIdentifierDefault extends IdentifierDefault implements GeneIdentifier {
 
     private final String hgncId;
 
-    GeneIdentifierDefault(String accession,
+    public GeneIdentifierDefault(String accession,
                           String symbol,
                           String hgncId) {
         super(accession, symbol);

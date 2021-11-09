@@ -1,13 +1,15 @@
-package xyz.ielis.silent.genes.model;
+package xyz.ielis.silent.genes.model.impl;
+
+import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
 import java.util.Objects;
 import java.util.Optional;
 
-class TranscriptIdentifierDefault extends IdentifierDefault implements TranscriptIdentifier {
+public class TranscriptIdentifierDefault extends IdentifierDefault implements TranscriptIdentifier {
 
     private final String ccdsId;
 
-    TranscriptIdentifierDefault(String accession, String symbol, String ccdsId) {
+    public TranscriptIdentifierDefault(String accession, String symbol, String ccdsId) {
         super(accession, symbol);
         this.ccdsId = ccdsId;
     }
