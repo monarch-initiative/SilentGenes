@@ -14,6 +14,8 @@ import java.io.IOException;
 
 public class GenomicRegionDeserializer extends StdDeserializer<GenomicRegion> {
 
+    private static final long serialVersionUID = 1L;
+
     private final GenomicAssembly assembly;
 
     public GenomicRegionDeserializer(GenomicAssembly assembly) {

@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class CoordinateSerializer extends StdSerializer<Coordinates> {
 
+    private static final long serialVersionUID = 1L;
+
     public CoordinateSerializer() {
         this(Coordinates.class);
     }

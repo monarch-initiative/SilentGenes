@@ -11,6 +11,8 @@ import java.io.IOException;
 
 public class CoordinateDeserializer extends StdDeserializer<Coordinates> {
 
+    private static final long serialVersionUID = 1L;
+
     public CoordinateDeserializer() {
         this(Coordinates.class);
     }

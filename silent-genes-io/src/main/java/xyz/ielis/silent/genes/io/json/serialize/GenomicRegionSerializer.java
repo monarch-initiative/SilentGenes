@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class GenomicRegionSerializer extends StdSerializer<GenomicRegion> {
 
+    private static final long serialVersionUID = 1L;
+
     public GenomicRegionSerializer() {
         this(GenomicRegion.class);
     }

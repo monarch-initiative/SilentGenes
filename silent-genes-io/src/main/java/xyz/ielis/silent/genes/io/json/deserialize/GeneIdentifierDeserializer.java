@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class GeneIdentifierDeserializer extends StdDeserializer<GeneIdentifier> {
 
+    private static final long serialVersionUID = 1L;
+
     public GeneIdentifierDeserializer() {
         this(GeneIdentifier.class);
     }

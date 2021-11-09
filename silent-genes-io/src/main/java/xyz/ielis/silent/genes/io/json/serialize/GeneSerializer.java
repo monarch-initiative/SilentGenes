@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class GeneSerializer extends StdSerializer<Gene> {
 
+    private static final long serialVersionUID = 1L;
+
     public GeneSerializer() {
         this(Gene.class);
     }

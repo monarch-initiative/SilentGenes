@@ -11,6 +11,8 @@ import java.io.IOException;
 
 public class TranscriptSerializer extends StdSerializer<Transcript> {
 
+    private static final long serialVersionUID = 1L;
+
     public TranscriptSerializer() {
         this(Transcript.class);
     }
