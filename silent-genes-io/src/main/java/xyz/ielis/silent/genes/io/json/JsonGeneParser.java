@@ -69,7 +69,7 @@ public class JsonGeneParser implements GeneParser {
         return objectMapper.readValue(inputStream, TYPE_REFERENCE);
     }
 
-    public void write(List<Gene> genes, OutputStream outputStream) throws IOException {
+    public void write(List<? extends Gene> genes, OutputStream outputStream) throws IOException {
         objectMapper.writeValue(outputStream, genes);
     }
 

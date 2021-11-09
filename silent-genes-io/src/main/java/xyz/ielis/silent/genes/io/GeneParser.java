@@ -11,17 +11,17 @@ import java.util.List;
 
 public interface GeneParser {
 
-    void write(List<Gene> genes, OutputStream outputStream) throws IOException;
+    void write(List<? extends Gene> genes, OutputStream outputStream) throws IOException;
 
-    default void write(List<Gene> genes, Path destination) throws IOException {
+    default void write(List<? extends Gene> genes, Path destination) throws IOException {
         try (OutputStream outputStream = Files.newOutputStream(destination)) {
             write(genes, outputStream);
         }
     }
 
-    List<Gene> read(InputStream inputStream) throws IOException;
+    List<? extends Gene> read(InputStream inputStream) throws IOException;
 
-    default List<Gene> read(Path source) throws IOException {
+    default List<? extends Gene> read(Path source) throws IOException {
         try (InputStream inputStream = Files.newInputStream(source)) {
             return read(inputStream);
         }
