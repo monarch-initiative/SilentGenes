@@ -33,6 +33,7 @@
         <spring-boot-starter.version>2.5.5</spring-boot-starter.version>
         <svart.version>2.0.0-SNAPSHOT</svart.version>
         <commons-compress.version>1.21</commons-compress.version>
+        <slf4j.version>1.7.32</slf4j.version>
     </properties>
 
     <developers>
