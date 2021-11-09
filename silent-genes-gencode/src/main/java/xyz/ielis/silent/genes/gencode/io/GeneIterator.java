@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GeneIterator implements Iterator<GencodeGene>, Closeable {
+public class GeneIterator implements Iterator<GencodeGene> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneIterator.class);
 
@@ -222,7 +222,18 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
 
     @Override
     public boolean hasNext() {
-        return !queue.isEmpty();
+        boolean hasNext = !queue.isEmpty();
+        if (!hasNext) {
+            // The queue is empty if there are no genes left. We can close the reader now
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Error closing the reader: {}", e.getMessage(), e);
+                }
+            }
+        }
+        return hasNext;
     }
 
     @Override
@@ -290,13 +301,5 @@ public class GeneIterator implements Iterator<GencodeGene>, Closeable {
             contigRecords.clear();
         }
         return contigRecords;
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (reader != null) {
-            reader.close();
-        }
-        queue.clear();
     }
 }
