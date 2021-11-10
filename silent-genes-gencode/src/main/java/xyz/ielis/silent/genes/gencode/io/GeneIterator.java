@@ -31,6 +31,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
     private static final Set<String> MANDATORY_GENE_ATTRIBUTE_NAMES = Set.of("gene_type", "gene_name", "level");
     private static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES = Set.of("transcript_id", "transcript_type", "transcript_name", "level");
     private static final Set<String> MANDATORY_EXON_ATTRIBUTE_NAMES = Set.of("transcript_id", "exon_id", "exon_number");
+    private static final String NCBI_GENE_ID_IS_NA = null; // Gencode does not provide NCBIGene IDs
 
     private final GenomicAssembly genomicAssembly;
     private final Queue<GencodeGene> queue = new LinkedList<>();
@@ -122,7 +123,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
 
 
         String hgncId = gene.attribute("hgnc_id");
-        GeneIdentifier geneIdentifier = GeneIdentifier.of(geneId, gene.attribute("gene_name"), hgncId);
+        GeneIdentifier geneIdentifier = GeneIdentifier.of(geneId, gene.attribute("gene_name"), hgncId, NCBI_GENE_ID_IS_NA);
         String type = gene.attribute("gene_type");
 
         Optional<EvidenceLevel> evidenceLevel = parseEvidenceLevel(gene.attribute("level"));

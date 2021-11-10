@@ -32,6 +32,11 @@ public class GeneIdentifierDeserializer extends StdDeserializer<GeneIdentifier> 
             hgncId = node.get("hgncId").asText();
         }
 
-        return GeneIdentifier.of(accession, symbol, hgncId);
+        String ncbiGeneId = null;
+        if (node.has("ncbiGeneId")) {
+            ncbiGeneId = node.get("ncbiGeneId").asText();
+        }
+
+        return GeneIdentifier.of(accession, symbol, hgncId, ncbiGeneId);
     }
 }

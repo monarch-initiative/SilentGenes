@@ -27,6 +27,8 @@ public class GeneIdentifierSerializer extends StdSerializer<GeneIdentifier> {
         gen.writeStringField("symbol", id.symbol());
         if (id.hgncId().isPresent())
             gen.writeStringField("hgncId", id.hgncId().get());
+        if (id.ncbiGeneId().isPresent())
+            gen.writeStringField("ncbiGeneId", id.ncbiGeneId().get());
 
         gen.writeEndObject();
     }

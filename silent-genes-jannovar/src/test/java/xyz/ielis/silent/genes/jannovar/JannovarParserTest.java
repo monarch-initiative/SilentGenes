@@ -59,6 +59,9 @@ public class JannovarParserTest {
 
         assertThat(surf1.accession(), equalTo("ENSG00000148290"));
         assertThat(surf1.symbol(), equalTo("SURF1"));
+        assertThat(surf1.id().hgncId().isPresent(), equalTo(true));
+        assertThat(surf1.id().hgncId().get(), equalTo("HGNC:11474"));
+        assertThat(surf1.id().ncbiGeneId().isPresent(), equalTo(false));
 
         List<Transcript> transcripts = new ArrayList<>();
         surf1.transcripts().forEach(transcripts::add);

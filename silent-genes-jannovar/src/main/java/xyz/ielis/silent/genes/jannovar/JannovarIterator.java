@@ -15,6 +15,7 @@ public class JannovarIterator implements Iterator<Gene> {
 
     // Jannovar stores coordinates in 0-based system
     private static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.zeroBased();
+    private static final String NCBI_GENE_ID_IS_NA = null; // not available in Jannovar databases
     private final Iterator<Map.Entry<String, Collection<TranscriptModel>>> iterator;
     private final GenomicAssembly assembly;
 
@@ -65,7 +66,7 @@ public class JannovarIterator implements Iterator<Gene> {
 
         String symbol = entry.getKey();
 
-        GeneIdentifier id = GeneIdentifier.of(geneId, symbol, altGeneIds.get("HGNC_ID"));
+        GeneIdentifier id = GeneIdentifier.of(geneId, symbol, altGeneIds.get("HGNC_ID"), NCBI_GENE_ID_IS_NA);
 
         GenomeInterval txInterval = first.getTXRegion();
         String contigName = txInterval.getRefDict().getContigIDToName().get(txInterval.getChr());

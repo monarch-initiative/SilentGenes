@@ -24,7 +24,7 @@ public class Genes {
         List<Transcript> transcripts = List.of(surf2_201);
 
         GenomicRegion location = GenomicRegion.of(contig, Strand.POSITIVE, CoordinateSystem.zeroBased(), 133_356_549, 133_361_158);
-        GeneIdentifier id = GeneIdentifier.of("ENSG00000148291.10", "SURF2", "HGNC:11475");
+        GeneIdentifier id = GeneIdentifier.of("ENSG00000148291.10", "SURF2", "HGNC:11475", "NCBIGene:6835");
         return Gene.of(id, location, transcripts);
     }
 
@@ -50,7 +50,7 @@ public class Genes {
     public static Gene surf1() {
         Contig contig = ASSEMBLY.contigByName("chr9");
 
-        GeneIdentifier id = GeneIdentifier.of("ENSG00000148290.10", "SURF1", "HGNC:11474");
+        GeneIdentifier id = GeneIdentifier.of("ENSG00000148290.10", "SURF1", "HGNC:11474", "NCBIGene:6834");
         GenomicRegion location = GenomicRegion.of(contig, Strand.POSITIVE, CoordinateSystem.zeroBased(), 133_351_757, 133_356_676).toNegativeStrand();
 
         Transcript surf1_201 = surf1_201(contig);
