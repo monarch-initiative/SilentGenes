@@ -2,7 +2,8 @@
   "id" : {
     "acc" : "ENSG00000148290.10",
     "symbol" : "SURF1",
-    "hgncId" : "HGNC:11474"
+    "hgncId" : "HGNC:11474",
+    "ncbiGeneId" : "NCBIGene:6834"
   },
   "loc" : {
     "gbAccession" : "CM000671.2",
@@ -108,7 +109,8 @@
   "id" : {
     "acc" : "ENSG00000148291.10",
     "symbol" : "SURF2",
-    "hgncId" : "HGNC:11475"
+    "hgncId" : "HGNC:11475",
+    "ncbiGeneId" : "NCBIGene:6835"
   },
   "loc" : {
     "gbAccession" : "CM000671.2",
