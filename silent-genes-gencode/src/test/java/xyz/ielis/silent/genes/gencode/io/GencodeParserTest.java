@@ -6,6 +6,7 @@ import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.monarchinitiative.svart.Strand;
+import xyz.ielis.silent.genes.gencode.model.Biotype;
 import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
 
@@ -66,7 +67,7 @@ public class GencodeParserTest {
             assertThat(surf2.id().hgncId().get(), equalTo("HGNC:11475"));
             assertThat(surf2.evidenceLevel(), equalTo(EvidenceLevel.MANUALLY_ANNOTATED));
 
-            assertThat(surf2.type(), equalTo("protein_coding"));
+            assertThat(surf2.biotype(), equalTo(Biotype.protein_coding));
 
             // ----------------------------------------- FBN1 ----------------------------------------------------------
             GencodeGene fbn1 = genes.get(1);
@@ -85,7 +86,7 @@ public class GencodeParserTest {
             assertThat(fbn1.id().hgncId().get(), equalTo("HGNC:3603"));
             assertThat(fbn1.evidenceLevel(), equalTo(EvidenceLevel.VERIFIED));
 
-            assertThat(fbn1.type(), equalTo("protein_coding"));
+            assertThat(fbn1.biotype(), equalTo(Biotype.protein_coding));
 
             // ----------------------------------------- SURF2 on scaffold ----------------------------------------------
             GencodeGene surf2OnScaffold = genes.get(2);
@@ -103,7 +104,7 @@ public class GencodeParserTest {
             assertThat(surf2OnScaffold.id().hgncId().get(), equalTo("HGNC:11475"));
             assertThat(surf2OnScaffold.evidenceLevel(), equalTo(EvidenceLevel.MANUALLY_ANNOTATED));
 
-            assertThat(surf2OnScaffold.type(), equalTo("protein_coding"));
+            assertThat(surf2OnScaffold.biotype(), equalTo(Biotype.protein_coding));
         }
     }
 

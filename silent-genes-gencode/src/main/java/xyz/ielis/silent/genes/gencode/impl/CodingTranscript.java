@@ -2,6 +2,7 @@ package xyz.ielis.silent.genes.gencode.impl;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
+import xyz.ielis.silent.genes.gencode.model.Biotype;
 import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.model.Coding;
 import xyz.ielis.silent.genes.model.TranscriptIdentifier;
@@ -18,10 +19,10 @@ public class CodingTranscript extends BaseTranscript implements Coding {
                              TranscriptIdentifier id,
                              Coordinates startCodon,
                              Coordinates stopCodon,
-                             String type,
+                             Biotype biotype,
                              EvidenceLevel evidenceLevel,
                              List<Coordinates> exons) {
-        super(location, id, type, evidenceLevel, exons);
+        super(location, id, biotype, evidenceLevel, exons);
         this.startCodon = startCodon;
         this.stopCodon = stopCodon;
     }
@@ -30,21 +31,21 @@ public class CodingTranscript extends BaseTranscript implements Coding {
                                       TranscriptIdentifier id,
                                       Coordinates startCodon,
                                       Coordinates stopCodon,
-                                      String type,
+                                      Biotype biotype,
                                       EvidenceLevel evidenceLevel,
                                       List<Coordinates> exons) {
         Objects.requireNonNull(location, "Location must not be null");
         Objects.requireNonNull(startCodon, "Start codon must not be null");
         Objects.requireNonNull(stopCodon, "Stop codon must not be null");
         Objects.requireNonNull(id, "ID must not be null");
-        Objects.requireNonNull(type, "Type must not be null");
+        Objects.requireNonNull(biotype, "Biotype must not be null");
         Objects.requireNonNull(evidenceLevel, "Evidence level must not be null");
         Objects.requireNonNull(exons, "Exons must not be null");
         if (exons.isEmpty()) {
             throw new IllegalArgumentException("Exon list must not be empty");
         }
 
-        return new CodingTranscript(location, id, startCodon, stopCodon, type, evidenceLevel, exons);
+        return new CodingTranscript(location, id, startCodon, stopCodon, biotype, evidenceLevel, exons);
     }
 
     @Override

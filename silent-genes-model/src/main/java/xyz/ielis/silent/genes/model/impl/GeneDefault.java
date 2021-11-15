@@ -8,6 +8,7 @@ import xyz.ielis.silent.genes.model.Transcript;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class GeneDefault implements Gene {
 
@@ -36,8 +37,8 @@ public class GeneDefault implements Gene {
     }
 
     @Override
-    public Iterable<? extends Transcript> transcripts() {
-        return transcripts;
+    public Stream<? extends Transcript> transcripts() {
+        return transcripts.stream();
     }
 
     @Override

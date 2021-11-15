@@ -8,7 +8,7 @@ public interface GencodeTranscript extends Transcript {
 
     TranscriptIdentifier id();
 
-    String type();
+    Biotype biotype();
 
     EvidenceLevel evidenceLevel();
 

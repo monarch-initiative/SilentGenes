@@ -15,6 +15,10 @@ public interface Located {
         return location().contig();
     }
 
+    default int contigId() {
+        return location().contig().id();
+    }
+
     default String contigName() {
         return location().contigName();
     }
@@ -35,12 +39,28 @@ public interface Located {
         return location().startWithCoordinateSystem(target);
     }
 
+    default int startOnStrand(Strand strand) {
+        return location().startOnStrand(strand);
+    }
+
+    default int startOnStrandWithCoordinateSystem(Strand strand, CoordinateSystem target) {
+        return location().startOnStrandWithCoordinateSystem(strand, target);
+    }
+
     default int end() {
         return location().end();
     }
 
     default int endWithCoordinateSystem(CoordinateSystem target) {
         return location().endWithCoordinateSystem(target);
+    }
+
+    default int endOnStrand(Strand strand) {
+        return location().endOnStrand(strand);
+    }
+
+    default int endOnStrandWithCoordinateSystem(Strand strand, CoordinateSystem target) {
+        return location().endOnStrandWithCoordinateSystem(strand, target);
     }
 
     default Coordinates coordinates() {

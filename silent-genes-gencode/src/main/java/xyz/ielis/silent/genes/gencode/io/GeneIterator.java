@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import xyz.ielis.silent.genes.gencode.impl.CodingTranscript;
 import xyz.ielis.silent.genes.gencode.impl.GencodeGeneImpl;
 import xyz.ielis.silent.genes.gencode.impl.NoncodingTranscript;
+import xyz.ielis.silent.genes.gencode.model.Biotype;
 import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
 import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
@@ -124,7 +125,12 @@ public class GeneIterator implements Iterator<GencodeGene> {
 
         String hgncId = gene.attribute("hgnc_id");
         GeneIdentifier geneIdentifier = GeneIdentifier.of(geneId, gene.attribute("gene_name"), hgncId, NCBI_GENE_ID_IS_NA);
-        String type = gene.attribute("gene_type");
+
+        Optional<Biotype> biotype = parseBiotype(gene.attribute("gene_type"));
+        if (biotype.isEmpty()) {
+            LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", gene.attribute("gene_name"), geneId);
+            return Optional.empty();
+        }
 
         Optional<EvidenceLevel> evidenceLevel = parseEvidenceLevel(gene.attribute("level"));
         if (evidenceLevel.isEmpty()) {
@@ -147,7 +153,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-        return Optional.of(GencodeGeneImpl.of(gene.location(), geneIdentifier, type, evidenceLevel.get(), txs));
+        return Optional.of(GencodeGeneImpl.of(gene.location(), geneIdentifier, biotype.get(), evidenceLevel.get(), txs));
     }
 
     private static Optional<GencodeTranscript> processTranscript(String txId,
@@ -161,13 +167,17 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-        String type = tx.attribute("transcript_type");
+        Optional<Biotype> biotype = parseBiotype(tx.attribute("transcript_type"));
+        if (biotype.isEmpty()) {
+            LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", tx.attribute("gene_name"), txId);
+            return Optional.empty();
+        }
         TranscriptIdentifier txIdentifier = TranscriptIdentifier.of(txId, tx.attribute("transcript_name"), tx.attribute("ccdsid"));
         List<Coordinates> exons = processExons(exonRecords);
 
         if (startCodon == null && stopCodon == null) {
             // should be non-coding transcript
-            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, type, level.get(), exons));
+            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, biotype.get(), level.get(), exons));
         } else {
             // should be coding transcript
             if (startCodon == null || stopCodon == null) {
@@ -178,9 +188,105 @@ public class GeneIterator implements Iterator<GencodeGene> {
                 }
                 return Optional.empty();
             } else {
-                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), type, level.get(), exons));
+                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), biotype.get(), level.get(), exons));
             }
         }
+    }
+
+    private static Optional<Biotype> parseBiotype(String geneType) {
+        switch (geneType.toLowerCase()) {
+            case "protein_coding":
+                return Optional.of(Biotype.protein_coding);
+
+            // --- ncRNA ---
+            case "mirna":
+                return Optional.of(Biotype.miRNA);
+            case "rrna":
+                return Optional.of(Biotype.rRNA);
+            case "srna":
+                return Optional.of(Biotype.sRNA);
+            case "scrna":
+                return Optional.of(Biotype.scRNA);
+            case "snrna":
+                return Optional.of(Biotype.snRNA);
+            case "scarna":
+                return Optional.of(Biotype.scaRNA);
+            case "snorna":
+                return Optional.of(Biotype.snoRNA);
+            case "vault_rna":
+                return Optional.of(Biotype.vaultRNA);
+            case "misc_rna":
+                return Optional.of(Biotype.misc_RNA);
+
+
+            // --- long non-coding RNA
+            case "lncrna":
+                return Optional.of(Biotype.lncRNA);
+
+            case "pseudogene":
+                return Optional.of(Biotype.pseudogene);
+
+            case "processed_pseudogene":
+                return Optional.of(Biotype.processed_pseudogene);
+            case "transcribed_processed_pseudogene":
+                return Optional.of(Biotype.transcribed_processed_pseudogene);
+            case "translated_processed_pseudogene":
+                return Optional.of(Biotype.translated_processed_pseudogene);
+            case "transcribed_unprocessed_pseudogene":
+                return Optional.of(Biotype.transcribed_unprocessed_pseudogene);
+            case "translated_unprocessed_pseudogene":
+                return Optional.of(Biotype.translated_unprocessed_pseudogene);
+            case "unitary_pseudogene":
+                return Optional.of(Biotype.unitary_pseudogene);
+            case "transcribed_unitary_pseudogene":
+                return Optional.of(Biotype.transcribed_unitary_pseudogene);
+            case "unprocessed_pseudogene":
+                return Optional.of(Biotype.unprocessed_pseudogene);
+            case "polymorphic_pseudogene":
+                return Optional.of(Biotype.polymorphic_pseudogene);
+
+            case "ig_c_gene":
+                return Optional.of(Biotype.IG_C_gene);
+            case "ig_j_gene":
+                return Optional.of(Biotype.IG_J_gene);
+            case "ig_v_gene":
+                return Optional.of(Biotype.IG_V_gene);
+            case "ig_d_gene":
+                return Optional.of(Biotype.IG_D_gene);
+
+            case "ig_pseudogene":
+                return Optional.of(Biotype.IG_pseudogene);
+            case "ig_c_pseudogene":
+                return Optional.of(Biotype.IG_C_pseudogene);
+            case "ig_j_pseudogene":
+                return Optional.of(Biotype.IG_J_pseudogene);
+            case "ig_v_pseudogene":
+                return Optional.of(Biotype.IG_V_pseudogene);
+
+            case "tr_c_gene":
+                return Optional.of(Biotype.TR_C_gene);
+            case "tr_j_gene":
+                return Optional.of(Biotype.TR_J_gene);
+            case "tr_v_gene":
+                return Optional.of(Biotype.TR_V_gene);
+            case "tr_d_gene":
+                return Optional.of(Biotype.TR_D_gene);
+            case "tr_v_pseudogene":
+                return Optional.of(Biotype.TR_V_pseudogene);
+            case "tr_j_pseudogene":
+                return Optional.of(Biotype.TR_J_pseudogene);
+
+            case "mt_rrna":
+                return Optional.of(Biotype.MT_rRNA);
+            case "mt_trna":
+                return Optional.of(Biotype.MT_tRNA);
+            case "ribozyme":
+            case "tec":
+            case "rrna_pseudogene":
+            default:
+                return Optional.of(Biotype.unknown);
+        }
+
     }
 
     private static Optional<EvidenceLevel> parseEvidenceLevel(String level) {
@@ -227,6 +333,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
         if (!hasNext) {
             // The queue is empty if there are no genes left. We can close the reader now
             if (reader != null) {
+                LOGGER.debug("Closing the file.");
                 try {
                     reader.close();
                 } catch (IOException e) {

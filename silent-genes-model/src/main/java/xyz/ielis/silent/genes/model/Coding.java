@@ -17,6 +17,22 @@ public interface Coding {
 
     Coordinates stopCodon();
 
+    default int codingStart() {
+        return startCodon().start();
+    }
+
+    default int codingStartWithCoordinateSystem(CoordinateSystem target) {
+        return startCodon().startWithCoordinateSystem(target);
+    }
+
+    default int codingEnd() {
+        return stopCodon().end() - stopCodon().length();
+    }
+
+    default int codingEndWithCoordinateSystem(CoordinateSystem target) {
+        return stopCodon().endWithCoordinateSystem(target) - stopCodon().length();
+    }
+
     default int cdsLength() {
         if (this instanceof Transcript) {
             return cdsLength(startCodon(), stopCodon(), ((Transcript) this).exons());
