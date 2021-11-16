@@ -9,6 +9,7 @@ import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class CodingTranscript extends BaseTranscript implements Coding {
 
@@ -21,8 +22,9 @@ public class CodingTranscript extends BaseTranscript implements Coding {
                              Coordinates stopCodon,
                              Biotype biotype,
                              EvidenceLevel evidenceLevel,
-                             List<Coordinates> exons) {
-        super(location, id, biotype, evidenceLevel, exons);
+                             List<Coordinates> exons,
+                             Set<String> tags) {
+        super(location, id, biotype, evidenceLevel, exons, tags);
         this.startCodon = startCodon;
         this.stopCodon = stopCodon;
     }
@@ -33,7 +35,8 @@ public class CodingTranscript extends BaseTranscript implements Coding {
                                       Coordinates stopCodon,
                                       Biotype biotype,
                                       EvidenceLevel evidenceLevel,
-                                      List<Coordinates> exons) {
+                                      List<Coordinates> exons,
+                                      Set<String> tags) {
         Objects.requireNonNull(location, "Location must not be null");
         Objects.requireNonNull(startCodon, "Start codon must not be null");
         Objects.requireNonNull(stopCodon, "Stop codon must not be null");
@@ -44,8 +47,9 @@ public class CodingTranscript extends BaseTranscript implements Coding {
         if (exons.isEmpty()) {
             throw new IllegalArgumentException("Exon list must not be empty");
         }
+        Objects.requireNonNull(tags, "Tags must not be null");
 
-        return new CodingTranscript(location, id, startCodon, stopCodon, biotype, evidenceLevel, exons);
+        return new CodingTranscript(location, id, startCodon, stopCodon, biotype, evidenceLevel, exons, tags);
     }
 
     @Override

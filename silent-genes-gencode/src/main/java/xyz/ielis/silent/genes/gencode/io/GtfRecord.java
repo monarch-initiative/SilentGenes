@@ -1,6 +1,6 @@
 package xyz.ielis.silent.genes.gencode.io;
 
-import org.monarchinitiative.svart.*;
+import org.monarchinitiative.svart.GenomicRegion;
 import xyz.ielis.silent.genes.model.Located;
 
 import java.util.Map;
@@ -14,34 +14,39 @@ class GtfRecord implements Located {
     private final GtfFeature feature;
     private final GtfFrame frame;
     private final Map<String, String> attributes;
+    private final Set<String> tags;
 
     private GtfRecord(GenomicRegion location,
                       GtfSource source,
                       GtfFeature feature,
                       GtfFrame frame,
-                      Map<String, String> attributes) {
+                      Map<String, String> attributes,
+                      Set<String> tags) {
         this.location = location;
         this.source = source;
         this.feature = feature;
         this.frame = frame;
         this.attributes = attributes;
+        this.tags = tags;
     }
 
     static GtfRecord of(GenomicRegion location,
                         GtfSource source,
                         GtfFeature feature,
                         GtfFrame frame,
-                        Map<String, String> attributes) {
+                        Map<String, String> attributes,
+                        Set<String> tags) {
         Objects.requireNonNull(location, "Location must not be null");
         Objects.requireNonNull(source, "GtfSource must not be null");
         Objects.requireNonNull(feature, "GtfFeature must not be null");
         Objects.requireNonNull(frame, "GtfFrame must not be null");
         Objects.requireNonNull(attributes, "Attributes map must not be null");
+        Objects.requireNonNull(tags, "Tags must not be null");
 
         if (!attributes.containsKey("gene_id"))
             throw new IllegalArgumentException("Missing the mandatory `gene_id` attribute: " + attributes);
 
-        return new GtfRecord(location, source, feature, frame, Map.copyOf(attributes));
+        return new GtfRecord(location, source, feature, frame, Map.copyOf(attributes), tags);
     }
 
     @Override
@@ -77,17 +82,21 @@ class GtfRecord implements Located {
         return attributes.get(key);
     }
 
+    public Set<String> tags() {
+        return tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GtfRecord gtfRecord = (GtfRecord) o;
-        return Objects.equals(location, gtfRecord.location) && source == gtfRecord.source && feature == gtfRecord.feature && frame == gtfRecord.frame && Objects.equals(attributes, gtfRecord.attributes);
+        return Objects.equals(location, gtfRecord.location) && source == gtfRecord.source && feature == gtfRecord.feature && frame == gtfRecord.frame && Objects.equals(attributes, gtfRecord.attributes) && Objects.equals(tags, gtfRecord.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(location, source, feature, frame, attributes);
+        return Objects.hash(location, source, feature, frame, attributes, tags);
     }
 
     @Override
@@ -98,6 +107,7 @@ class GtfRecord implements Located {
                 ", feature=" + feature +
                 ", frame=" + frame +
                 ", attributes=" + attributes +
+                ", tags=" + tags +
                 '}';
     }
 }

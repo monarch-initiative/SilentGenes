@@ -2,6 +2,7 @@ package xyz.ielis.silent.genes.gencode.model;
 
 import xyz.ielis.silent.genes.model.Gene;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 public interface GencodeGene extends Gene {
@@ -12,4 +13,6 @@ public interface GencodeGene extends Gene {
 
     @Override
     Stream<? extends GencodeTranscript> transcripts();
+
+    Set<String> tags();
 }

@@ -117,7 +117,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-        // id, type, status, name
+        // id, type, status, name, tags
         if (!gene.attributes().containsAll(MANDATORY_GENE_ATTRIBUTE_NAMES)) {
             return reportMissingAttributesAndReturn(gene, MANDATORY_GENE_ATTRIBUTE_NAMES);
         }
@@ -138,7 +138,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-
+        // transcripts
         List<GencodeTranscript> txs = new ArrayList<>(transcripts.size());
         for (GtfRecord txRecord : transcripts) {
             String txId = txRecord.attribute("transcript_id"); // the attribute is present (checked above)
@@ -153,7 +153,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-        return Optional.of(GencodeGeneImpl.of(gene.location(), geneIdentifier, biotype.get(), evidenceLevel.get(), txs));
+        return Optional.of(GencodeGeneImpl.of(gene.location(), geneIdentifier, biotype.get(), evidenceLevel.get(), txs, gene.tags()));
     }
 
     private static Optional<GencodeTranscript> processTranscript(String txId,
@@ -177,7 +177,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
 
         if (startCodon == null && stopCodon == null) {
             // should be non-coding transcript
-            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, biotype.get(), level.get(), exons));
+            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, biotype.get(), level.get(), exons, tx.tags()));
         } else {
             // should be coding transcript
             if (startCodon == null || stopCodon == null) {
@@ -188,7 +188,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
                 }
                 return Optional.empty();
             } else {
-                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), biotype.get(), level.get(), exons));
+                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), biotype.get(), level.get(), exons, tx.tags()));
             }
         }
     }

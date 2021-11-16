@@ -4,9 +4,7 @@ import org.monarchinitiative.svart.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +13,7 @@ class GtfRecordParser {
     static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.oneBased(); // GTF invariant
     private static final Logger LOGGER = LoggerFactory.getLogger(GtfRecordParser.class);
     private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("(?<key>[\\w_]+)\\s*(?<value>[\\w\\d_:./\\-\"]+)");
+    private static final Pattern TAG_PATTERN = Pattern.compile("tag\\s*\"(?<value>[\\w\\d_:./\\-]+)\"");
     // max number of fields in the GTF file used to develop this parser. A good default capacity for the attribute map
     private static final int N_ATTRIBUTE_FIELDS = 26;
 
@@ -30,8 +29,9 @@ class GtfRecordParser {
             GtfFeature feature = parseFeature(token[2]);
             GtfFrame frame = parseFrame(token[7]);
             Map<String, String> attributes = parseAttributes(token[8]);
+            Set<String> tags = parseTags(token[8]);
 
-            return Optional.of(GtfRecord.of(location, source, feature, frame, attributes));
+            return Optional.of(GtfRecord.of(location, source, feature, frame, attributes, tags));
         } catch (GtfParseException e) {
             LOGGER.warn("{}. Line {}", e.getMessage(), line);
             return Optional.empty();
@@ -153,6 +153,15 @@ class GtfRecordParser {
         }
 
         return attributes;
+    }
+
+    private static Set<String> parseTags(String payload) {
+        Matcher matcher = TAG_PATTERN.matcher(payload);
+        Set<String> builder = new HashSet<>();
+        while (matcher.find()) {
+            builder.add(matcher.group("value"));
+        }
+        return Set.copyOf(builder);
     }
 
 }

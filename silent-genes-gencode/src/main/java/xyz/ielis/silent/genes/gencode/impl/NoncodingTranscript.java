@@ -8,6 +8,7 @@ import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class NoncodingTranscript extends BaseTranscript {
 
@@ -15,15 +16,17 @@ public class NoncodingTranscript extends BaseTranscript {
                                 TranscriptIdentifier id,
                                 Biotype biotype,
                                 EvidenceLevel evidenceLevel,
-                                List<Coordinates> exons) {
-        super(location, id, biotype, evidenceLevel, exons);
+                                List<Coordinates> exons,
+                                Set<String> tags) {
+        super(location, id, biotype, evidenceLevel, exons, tags);
     }
 
     public static NoncodingTranscript of(GenomicRegion location,
                                          TranscriptIdentifier id,
                                          Biotype biotype,
                                          EvidenceLevel evidenceLevel,
-                                         List<Coordinates> exons) {
+                                         List<Coordinates> exons,
+                                         Set<String> tags) {
         Objects.requireNonNull(location, "Location must not be null");
         Objects.requireNonNull(id, "ID must not be null");
         Objects.requireNonNull(biotype, "Biotype must not be null");
@@ -32,7 +35,9 @@ public class NoncodingTranscript extends BaseTranscript {
         if (exons.isEmpty()) {
             throw new IllegalArgumentException("Exon list must not be empty");
         }
-        return new NoncodingTranscript(location, id, biotype, evidenceLevel, exons);
+        Objects.requireNonNull(tags, "Tags must not be null");
+
+        return new NoncodingTranscript(location, id, biotype, evidenceLevel, exons, tags);
     }
 
     @Override

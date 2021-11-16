@@ -9,8 +9,7 @@ import org.monarchinitiative.svart.Strand;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.*;
 
 public class GtfRecordParserTest {
 
@@ -32,6 +31,7 @@ public class GtfRecordParserTest {
         assertThat(record.attribute("gene_name"), equalTo("MIR6859-1"));
         assertThat(record.attribute("hgnc_id"), equalTo("HGNC:50039"));
         assertThat(record.attribute("gene_name"), equalTo("MIR6859-1"));
+        assertThat(record.tags(), empty());
 
         assertThat(record.contigName(), equalTo("1"));
         assertThat(record.strand(), equalTo(Strand.NEGATIVE));
@@ -52,6 +52,7 @@ public class GtfRecordParserTest {
         assertThat(record.feature(), equalTo(GtfFeature.TRANSCRIPT));
         assertThat(record.frame(), equalTo(GtfFrame.NA));
         assertThat(record.geneId(), equalTo("ENSG00000223972.5"));
+        assertThat(record.tags(), hasItems("basic", "Ensembl_canonical"));
 
         assertThat(record.contigName(), equalTo("1"));
         assertThat(record.strand(), equalTo(Strand.POSITIVE));

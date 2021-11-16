@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 public class GencodeParserTest {
 
@@ -68,6 +67,7 @@ public class GencodeParserTest {
             assertThat(surf2.evidenceLevel(), equalTo(EvidenceLevel.MANUALLY_ANNOTATED));
 
             assertThat(surf2.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(surf2.tags(), empty());
 
             // ----------------------------------------- FBN1 ----------------------------------------------------------
             GencodeGene fbn1 = genes.get(1);
@@ -87,6 +87,7 @@ public class GencodeParserTest {
             assertThat(fbn1.evidenceLevel(), equalTo(EvidenceLevel.VERIFIED));
 
             assertThat(fbn1.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(fbn1.tags(), hasItems("overlapping_locus"));
 
             // ----------------------------------------- SURF2 on scaffold ----------------------------------------------
             GencodeGene surf2OnScaffold = genes.get(2);
@@ -105,6 +106,7 @@ public class GencodeParserTest {
             assertThat(surf2OnScaffold.evidenceLevel(), equalTo(EvidenceLevel.MANUALLY_ANNOTATED));
 
             assertThat(surf2OnScaffold.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(surf2OnScaffold.tags(), empty());
         }
     }
 
