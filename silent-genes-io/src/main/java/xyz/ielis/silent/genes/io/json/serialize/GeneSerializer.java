@@ -32,7 +32,7 @@ public class GeneSerializer extends StdSerializer<Gene> {
         gen.writeObjectField("loc", gene.location());
 
         // sort before writing out to get deterministic output
-        List<Transcript> transcripts = gene.transcripts()
+        List<Transcript> transcripts = gene.transcriptStream()
                 .sorted(Comparator.comparing(Identified::accession))
                 .collect(Collectors.toUnmodifiableList());
 

@@ -8,9 +8,9 @@ import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
 import xyz.ielis.silent.genes.model.GeneIdentifier;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class GencodeGeneImpl implements GencodeGene {
 
@@ -74,8 +74,13 @@ public class GencodeGeneImpl implements GencodeGene {
     }
 
     @Override
-    public Stream<? extends GencodeTranscript> transcripts() {
-        return transcripts.stream();
+    public Iterator<? extends GencodeTranscript> transcripts() {
+        return transcripts.iterator();
+    }
+
+    @Override
+    public int transcriptCount() {
+        return transcripts.size();
     }
 
     @Override
