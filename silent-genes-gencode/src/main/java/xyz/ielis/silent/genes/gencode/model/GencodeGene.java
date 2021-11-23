@@ -2,14 +2,27 @@ package xyz.ielis.silent.genes.gencode.model;
 
 import xyz.ielis.silent.genes.model.Gene;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 public interface GencodeGene extends Gene {
 
-    // e.g. protein_coding, miRNA, lncRNA, etc.
-    // TODO - implement a fat enum based on `https://www.gencodegenes.org/pages/biotypes.html`
-    String type();
+    Biotype biotype();
 
     EvidenceLevel evidenceLevel();
 
     @Override
-    Iterable<? extends GencodeTranscript> transcripts();
+    Iterator<? extends GencodeTranscript> transcripts();
+
+    Set<String> tags();
+
+    @Override
+    default Stream<? extends GencodeTranscript> transcriptStream() {
+        return StreamSupport.stream(Spliterators.spliterator(transcripts(), transcriptCount(),
+                Spliterator.DISTINCT & Spliterator.SIZED), false);
+    }
 }

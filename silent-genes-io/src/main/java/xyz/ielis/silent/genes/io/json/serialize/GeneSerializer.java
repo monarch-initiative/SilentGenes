@@ -8,9 +8,9 @@ import xyz.ielis.silent.genes.model.Identified;
 import xyz.ielis.silent.genes.model.Transcript;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GeneSerializer extends StdSerializer<Gene> {
 
@@ -32,11 +32,9 @@ public class GeneSerializer extends StdSerializer<Gene> {
         gen.writeObjectField("loc", gene.location());
 
         // sort before writing out to get deterministic output
-        List<Transcript> transcripts = new ArrayList<>();
-        for (Transcript tx : gene.transcripts()) {
-            transcripts.add(tx);
-        }
-        transcripts.sort(Comparator.comparing(Identified::accession));
+        List<Transcript> transcripts = gene.transcriptStream()
+                .sorted(Comparator.comparing(Identified::accession))
+                .collect(Collectors.toUnmodifiableList());
 
         gen.writeArrayFieldStart("transcripts");
         for (Transcript tx : transcripts) {

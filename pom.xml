@@ -12,6 +12,7 @@
         <module>silent-genes-io</module>
         <module>silent-genes-gencode</module>
         <module>silent-genes-jannovar</module>
+        <module>silent-genes-cli</module>
     </modules>
 
     <groupId>xyz.ielis.silent.genes</groupId>
@@ -36,6 +37,7 @@
         <jannovar.version>0.35</jannovar.version>
         <guava.version>31.0.1-jre</guava.version>
         <commons-compress.version>1.21</commons-compress.version>
+        <picocli.version>4.6.2</picocli.version>
         <slf4j.version>1.7.32</slf4j.version>
     </properties>
 
@@ -142,13 +144,23 @@
                 <artifactId>commons-compress</artifactId>
                 <version>${commons-compress.version}</version>
             </dependency>
+            <dependency>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli</artifactId>
+                <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

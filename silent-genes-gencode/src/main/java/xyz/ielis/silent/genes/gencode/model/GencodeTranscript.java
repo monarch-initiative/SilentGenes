@@ -4,14 +4,15 @@ package xyz.ielis.silent.genes.gencode.model;
 import xyz.ielis.silent.genes.model.Transcript;
 import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
+import java.util.Set;
+
 public interface GencodeTranscript extends Transcript {
 
     TranscriptIdentifier id();
 
-    String type();
+    Biotype biotype();
 
     EvidenceLevel evidenceLevel();
 
-    // TODO - attributes from https://www.gencodegenes.org/pages/tags.html
-    //  e.g. appris, basic...
+    Set<String> tags();
 }

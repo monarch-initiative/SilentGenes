@@ -64,7 +64,7 @@ public class JannovarParserTest {
         assertThat(surf1.id().ncbiGeneId().isPresent(), equalTo(false));
 
         List<Transcript> transcripts = new ArrayList<>();
-        surf1.transcripts().forEach(transcripts::add);
+        surf1.transcriptStream().forEach(transcripts::add);
 
         assertThat(transcripts, hasSize(3));
         Set<String> accessions = transcripts.stream().map(Identified::accession).collect(Collectors.toUnmodifiableSet());

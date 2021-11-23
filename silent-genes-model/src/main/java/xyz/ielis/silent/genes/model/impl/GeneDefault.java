@@ -6,6 +6,7 @@ import xyz.ielis.silent.genes.model.GeneIdentifier;
 import xyz.ielis.silent.genes.model.Transcript;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,8 +37,13 @@ public class GeneDefault implements Gene {
     }
 
     @Override
-    public Iterable<? extends Transcript> transcripts() {
-        return transcripts;
+    public Iterator<? extends Transcript> transcripts() {
+        return transcripts.iterator();
+    }
+
+    @Override
+    public int transcriptCount() {
+        return transcripts.size();
     }
 
     @Override
