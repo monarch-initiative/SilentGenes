@@ -45,7 +45,9 @@ public class TranscriptDeserializer extends StdDeserializer<Transcript> {
             // coding transcript
             Coordinates startCodon = codec.treeToValue(node.get("startCodon"), Coordinates.class);
             Coordinates stopCodon = codec.treeToValue(node.get("stopCodon"), Coordinates.class);
-            return Transcript.coding(id, location, exons, startCodon, stopCodon);
+            Coordinates fivePrimeRegion = codec.treeToValue(node.get("fivePrimeRegion"), Coordinates.class);
+            Coordinates threePrimeRegion = codec.treeToValue(node.get("threePrimeRegion"), Coordinates.class);
+            return Transcript.coding(id, location, exons, startCodon, stopCodon, fivePrimeRegion, threePrimeRegion);
         }
 
         // non-coding transcript

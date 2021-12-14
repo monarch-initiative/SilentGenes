@@ -104,8 +104,10 @@ public class JannovarIterator implements Iterator<Gene> {
         GenomeInterval cds = tx.getCDSRegion();
         Coordinates startCodon = Coordinates.of(COORDINATE_SYSTEM, cds.getBeginPos(), cds.getBeginPos() + 3);
         Coordinates stopCodon = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() - 3, cds.getEndPos());
+        Coordinates fivePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, txRegion.getBeginPos(), cds.getBeginPos() - 1);
+        Coordinates threePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() + 2, txRegion.getEndPos());
 
-        return Transcript.coding(txId, location, exons, startCodon, stopCodon);
+        return Transcript.coding(txId, location, exons, startCodon, stopCodon, fivePrimeRegion, threePrimeRegion);
     }
 
     private static Transcript parseNoncodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {

@@ -27,8 +27,8 @@ public interface Transcript extends Located, Identified<TranscriptIdentifier> {
                              GenomicRegion location,
                              List<Coordinates> exons,
                              Coordinates startCodon,
-                             Coordinates stopCodon) {
-        return CodingTranscript.of(id, location, exons, startCodon, stopCodon);
+                             Coordinates stopCodon, Coordinates fivePrimeRegion, Coordinates threePrimeRegion) {
+        return CodingTranscript.of(id, location, exons, startCodon, stopCodon, fivePrimeRegion, threePrimeRegion);
     }
 
     List<Coordinates> exons();

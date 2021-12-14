@@ -41,8 +41,10 @@ public class Genes {
         );
         Coordinates startCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_592, 133_356_595);
         Coordinates stopCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_361_136, 133_361_139);
+        Coordinates fivePrimeRegion = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_454, 133_356_487).invert(contig);
+        Coordinates threePrimeRegion = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_758, 133_351_913).invert(contig);
 
-        return Transcript.coding(txId, location, exons, startCds, stopCds);
+        return Transcript.coding(txId, location, exons, startCds, stopCds, fivePrimeRegion, threePrimeRegion);
     }
 
     // ------------------------------------------------- FBN1 ----------------------------------------------------------
@@ -76,8 +78,9 @@ public class Genes {
                 );
         Coordinates startCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_450, 133_356_453).invert(contig);
         Coordinates stopCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_351_915).invert(contig);
-
-        return Transcript.coding(txId, location, exons, startCds, stopCds);
+        Coordinates fivePrimeRegion = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_454, 133_356_487).invert(contig);
+        Coordinates threePrimeRegion = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_758, 133_351_913).invert(contig);
+        return Transcript.coding(txId, location, exons, startCds, stopCds, fivePrimeRegion, threePrimeRegion);
     }
 
     public static Transcript surf1_205(Contig contig) {
@@ -93,10 +96,13 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_352_060, 133_352_142).invert(contig),
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_804, 133_351_982).invert(contig)
         );
+
         Coordinates startCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_450, 133_356_453).invert(contig);
         Coordinates stopCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_351_915).invert(contig);
+        Coordinates fivePrimeRegion = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_454, 133_356_487).invert(contig);
+        Coordinates threePrimeRegion = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_758, 133_351_913).invert(contig);
 
-        return Transcript.coding(txId, location, exons, startCds, stopCds);
+        return Transcript.coding(txId, location, exons, startCds, stopCds, fivePrimeRegion, threePrimeRegion);
     }
 
 }
