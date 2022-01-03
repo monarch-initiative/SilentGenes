@@ -4,10 +4,7 @@ import de.charite.compbio.jannovar.data.JannovarData;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.monarchinitiative.svart.*;
-import xyz.ielis.silent.genes.model.Gene;
-import xyz.ielis.silent.genes.model.GeneIdentifier;
-import xyz.ielis.silent.genes.model.Transcript;
-import xyz.ielis.silent.genes.model.TranscriptIdentifier;
+import xyz.ielis.silent.genes.model.*;
 
 import java.util.*;
 
@@ -97,17 +94,17 @@ public class JannovarIterator implements Iterator<Gene> {
         return txs;
     }
 
-    private static Transcript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
+    private static CodingTranscript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
         GenomeInterval txRegion = tx.getTXRegion();
         GenomicRegion location = GenomicRegion.of(contig, strand, COORDINATE_SYSTEM, txRegion.getBeginPos(), txRegion.getEndPos());
         List<Coordinates> exons = remapExons(tx.getExonRegions());
         GenomeInterval cds = tx.getCDSRegion();
-        Coordinates startCodon = Coordinates.of(COORDINATE_SYSTEM, cds.getBeginPos(), cds.getBeginPos() + 3);
-        Coordinates stopCodon = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() - 3, cds.getEndPos());
-        Coordinates fivePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, txRegion.getBeginPos(), cds.getBeginPos() - 1);
-        Coordinates threePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() + 2, txRegion.getEndPos());
+        Coordinates cdsCoordinates = Coordinates.of(COORDINATE_SYSTEM, cds.getBeginPos(), cds.getEndPos());
+//        Coordinates stopCodon = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() - 3, cds.getEndPos());
+//        Coordinates fivePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, txRegion.getBeginPos(), cds.getBeginPos() - 1);
+//        Coordinates threePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() + 2, txRegion.getEndPos());
 
-        return Transcript.coding(txId, location, exons, startCodon, stopCodon, fivePrimeRegion, threePrimeRegion);
+        return Transcript.coding(txId, location, exons, cdsCoordinates);
     }
 
     private static Transcript parseNoncodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {

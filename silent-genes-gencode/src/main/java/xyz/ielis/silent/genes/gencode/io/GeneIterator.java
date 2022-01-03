@@ -1,13 +1,14 @@
 package xyz.ielis.silent.genes.gencode.io;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.ielis.silent.genes.gencode.impl.CodingTranscript;
+import xyz.ielis.silent.genes.gencode.impl.GencodeCodingTranscript;
 import xyz.ielis.silent.genes.gencode.impl.GencodeGeneImpl;
-import xyz.ielis.silent.genes.gencode.impl.NoncodingTranscript;
+import xyz.ielis.silent.genes.gencode.impl.GencodeNoncodingTranscript;
 import xyz.ielis.silent.genes.gencode.model.Biotype;
 import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
@@ -177,7 +178,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
 
         if (startCodon == null && stopCodon == null) {
             // should be non-coding transcript
-            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, biotype.get(), level.get(), exons, tx.tags()));
+            return Optional.of(GencodeNoncodingTranscript.of(tx.location(), txIdentifier, biotype.get(), level.get(), exons, tx.tags()));
         } else {
             // should be coding transcript
             if (startCodon == null || stopCodon == null) {
@@ -188,7 +189,11 @@ public class GeneIterator implements Iterator<GencodeGene> {
                 }
                 return Optional.empty();
             } else {
-                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), biotype.get(), level.get(), exons, tx.tags()));
+                CoordinateSystem cs = tx.location().coordinateSystem();
+                Coordinates cds = Coordinates.of(cs,
+                        startCodon.startWithCoordinateSystem(cs),
+                        stopCodon.endWithCoordinateSystem(cs));
+                return Optional.of(GencodeCodingTranscript.of(tx.location(), txIdentifier, cds, biotype.get(), level.get(), exons, tx.tags()));
             }
         }
     }

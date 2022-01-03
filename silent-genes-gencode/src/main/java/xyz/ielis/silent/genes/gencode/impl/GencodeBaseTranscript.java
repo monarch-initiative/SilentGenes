@@ -1,43 +1,34 @@
 package xyz.ielis.silent.genes.gencode.impl;
 
+import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
 import xyz.ielis.silent.genes.gencode.model.Biotype;
 import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
-import xyz.ielis.silent.genes.gencode.model.GencodeGene;
 import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
-import xyz.ielis.silent.genes.model.GeneIdentifier;
-import xyz.ielis.silent.genes.model.impl.GeneDefault;
+import xyz.ielis.silent.genes.model.TranscriptIdentifier;
+import xyz.ielis.silent.genes.model.impl.BaseTranscript;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class GencodeGeneImpl extends GeneDefault implements GencodeGene {
+abstract class GencodeBaseTranscript extends BaseTranscript implements GencodeTranscript {
 
     private final Biotype biotype;
     private final EvidenceLevel evidenceLevel;
     private final Set<String> tags;
 
-    public static GencodeGeneImpl of(GenomicRegion location,
-                                     GeneIdentifier id,
-                                     Biotype biotype,
-                                     EvidenceLevel evidenceLevel,
-                                     Collection<GencodeTranscript> transcripts,
-                                     Collection<String> tags) {
-        return new GencodeGeneImpl(id, biotype, evidenceLevel, location, Set.copyOf(transcripts), Set.copyOf(tags));
-    }
-
-    private GencodeGeneImpl(GeneIdentifier id,
-                            Biotype biotype,
-                            EvidenceLevel evidenceLevel,
-                            GenomicRegion location,
-                            Set<GencodeTranscript> transcripts,
-                            Set<String> tags) {
-        super(id, location, transcripts);
+    protected GencodeBaseTranscript(GenomicRegion location,
+                                    TranscriptIdentifier id,
+                                    Biotype biotype,
+                                    EvidenceLevel evidenceLevel,
+                                    List<Coordinates> exons,
+                                    Set<String> tags) {
+        super(id, location, exons);
         this.biotype = Objects.requireNonNull(biotype, "Biotype must not be null");
         this.evidenceLevel = Objects.requireNonNull(evidenceLevel, "Evidence level must not be null");
-        this.tags = Objects.requireNonNull(tags, "Tags must not be empty");
+        this.tags = Objects.requireNonNull(tags, "Tags must not be null");
+
     }
 
     @Override
@@ -60,7 +51,7 @@ public class GencodeGeneImpl extends GeneDefault implements GencodeGene {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        GencodeGeneImpl that = (GencodeGeneImpl) o;
+        GencodeBaseTranscript that = (GencodeBaseTranscript) o;
         return biotype == that.biotype && evidenceLevel == that.evidenceLevel && Objects.equals(tags, that.tags);
     }
 
@@ -71,7 +62,7 @@ public class GencodeGeneImpl extends GeneDefault implements GencodeGene {
 
     @Override
     public String toString() {
-        return "GencodeGeneImpl{" +
+        return "GencodeBaseTranscript{" +
                 "biotype=" + biotype +
                 ", evidenceLevel=" + evidenceLevel +
                 ", tags=" + tags +

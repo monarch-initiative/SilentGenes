@@ -8,7 +8,7 @@ import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 import java.util.List;
 import java.util.Objects;
 
-abstract class BaseTranscript implements Transcript {
+public abstract class BaseTranscript implements Transcript {
 
     private final TranscriptIdentifier id;
     private final GenomicRegion location;

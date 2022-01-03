@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.monarchinitiative.svart.Coordinates;
 import xyz.ielis.silent.genes.model.Coding;
+import xyz.ielis.silent.genes.model.CodingTranscript;
 import xyz.ielis.silent.genes.model.Transcript;
 
 import java.io.IOException;
@@ -32,10 +33,9 @@ public class TranscriptSerializer extends StdSerializer<Transcript> {
             gen.writeObject(exon);
         }
         gen.writeEndArray();
-        if (tx instanceof Coding) {
-            Coding coding = (Coding) tx;
-            gen.writeObjectField("startCodon", coding.startCodon());
-            gen.writeObjectField("stopCodon", coding.stopCodon());
+        if (tx instanceof CodingTranscript) {
+            CodingTranscript coding = (CodingTranscript) tx;
+            gen.writeObjectField("cdsCoordinates", coding.cdsCoordinates());
         }
 
         gen.writeEndObject();

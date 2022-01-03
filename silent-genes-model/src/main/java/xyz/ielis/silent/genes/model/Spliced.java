@@ -20,4 +20,11 @@ public interface Spliced {
                 Spliterator.DISTINCT & Spliterator.SIZED), false);
     }
 
+    default Stream<? extends CodingTranscript> codingTranscripts() {
+        return transcriptStream()
+                .filter(Transcript::isCoding)
+                .map(CodingTranscript.class::cast);
+    }
+
+
 }
