@@ -393,8 +393,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
 
         return recordByGeneId.entrySet().stream()
                 .map(e -> assembleGene(e.getKey(), e.getValue()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toUnmodifiableList());
     }
 
