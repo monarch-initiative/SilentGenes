@@ -73,13 +73,13 @@ public class JannovarIterator implements Iterator<Gene> {
 
         Strand strand = parseStrand(txInterval.getStrand());
         GenomicRegion location = parseLocation(contig, strand, transcripts);
-        Collection<? extends Transcript> txs = parseTranscripts(contig, strand, transcripts);
+        List<? extends Transcript> txs = parseTranscripts(contig, strand, transcripts);
 
         return Gene.of(id, location, txs);
     }
 
-    private static Collection<? extends Transcript> parseTranscripts(Contig contig, Strand strand, Collection<TranscriptModel> transcripts) {
-        Set<Transcript> txs = new HashSet<>(transcripts.size());
+    private static List<? extends Transcript> parseTranscripts(Contig contig, Strand strand, Collection<TranscriptModel> transcripts) {
+        List<Transcript> txs = new ArrayList<>(transcripts.size());
 
         for (TranscriptModel tx : transcripts) {
             // Symbol is not transferred, nor is ccdsId
@@ -91,7 +91,7 @@ public class JannovarIterator implements Iterator<Gene> {
             }
         }
 
-        return txs;
+        return Collections.unmodifiableList(txs);
     }
 
     private static CodingTranscript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {

@@ -1,4 +1,4 @@
-package xyz.ielis.silent.genes.model.impl;
+package xyz.ielis.silent.genes.model.base;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;

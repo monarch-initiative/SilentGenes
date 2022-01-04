@@ -2,43 +2,39 @@ package xyz.ielis.silent.genes.gencode.impl;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
-import xyz.ielis.silent.genes.gencode.model.Biotype;
-import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
+import xyz.ielis.silent.genes.gencode.model.GencodeMetadata;
+import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
 import xyz.ielis.silent.genes.model.CodingTranscript;
 import xyz.ielis.silent.genes.model.TranscriptIdentifier;
+import xyz.ielis.silent.genes.model.base.BaseCodingTranscript;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-public class GencodeCodingTranscript extends GencodeBaseTranscript implements CodingTranscript {
+public class GencodeCodingTranscript extends BaseCodingTranscript implements GencodeTranscript, CodingTranscript {
 
-    private final Coordinates cdsCoordinates;
+    private final GencodeMetadata gencodeMetadata;
 
-    private GencodeCodingTranscript(GenomicRegion location,
-                                    TranscriptIdentifier id,
-                                    Coordinates cdsCoordinates,
-                                    Biotype biotype,
-                                    EvidenceLevel evidenceLevel,
-                                    List<Coordinates> exons,
-                                    Set<String> tags) {
-        super(location, id, biotype, evidenceLevel, exons, tags);
-        this.cdsCoordinates = Objects.requireNonNull(cdsCoordinates, "Coding Sequence Coordinates must not be null");
+    public static GencodeCodingTranscript of(TranscriptIdentifier id,
+                                             GenomicRegion location,
+                                             List<Coordinates> exons,
+                                             Coordinates cdsCoordinates,
+                                             GencodeMetadata gencodeMetadata) {
+        return new GencodeCodingTranscript(id, location, exons, cdsCoordinates, gencodeMetadata);
     }
 
-    public static GencodeCodingTranscript of(GenomicRegion location,
-                                             TranscriptIdentifier id,
-                                             Coordinates cdsCoordinates,
-                                             Biotype biotype,
-                                             EvidenceLevel evidenceLevel,
-                                             List<Coordinates> exons,
-                                             Set<String> tags) {
-        return new GencodeCodingTranscript(location, id, cdsCoordinates, biotype, evidenceLevel, exons, tags);
+    private GencodeCodingTranscript(TranscriptIdentifier id,
+                                    GenomicRegion location,
+                                    List<Coordinates> exons,
+                                    Coordinates cdsCoordinates,
+                                    GencodeMetadata gencodeMetadata) {
+        super(id, location, exons, cdsCoordinates);
+        this.gencodeMetadata = Objects.requireNonNull(gencodeMetadata, "Gencode metadata must not be null");
     }
 
     @Override
-    public Coordinates cdsCoordinates() {
-        return cdsCoordinates;
+    public GencodeMetadata gencodeMetadata() {
+        return gencodeMetadata;
     }
 
     @Override
@@ -47,18 +43,18 @@ public class GencodeCodingTranscript extends GencodeBaseTranscript implements Co
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         GencodeCodingTranscript that = (GencodeCodingTranscript) o;
-        return Objects.equals(cdsCoordinates, that.cdsCoordinates);
+        return Objects.equals(gencodeMetadata, that.gencodeMetadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), cdsCoordinates);
+        return Objects.hash(super.hashCode(), gencodeMetadata);
     }
 
     @Override
     public String toString() {
-        return "CodingTranscript{" +
-                "cdsCoordinates=" + cdsCoordinates +
-                '}';
+        return "GencodeCodingTranscript{" +
+                "gencodeMetadata=" + gencodeMetadata +
+                "} " + super.toString();
     }
 }

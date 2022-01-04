@@ -2,48 +2,29 @@ package xyz.ielis.silent.genes.gencode.impl;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
-import xyz.ielis.silent.genes.gencode.model.Biotype;
-import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
+import xyz.ielis.silent.genes.gencode.model.GencodeMetadata;
 import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
 import xyz.ielis.silent.genes.model.TranscriptIdentifier;
-import xyz.ielis.silent.genes.model.impl.BaseTranscript;
+import xyz.ielis.silent.genes.model.base.BaseTranscript;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 abstract class GencodeBaseTranscript extends BaseTranscript implements GencodeTranscript {
 
-    private final Biotype biotype;
-    private final EvidenceLevel evidenceLevel;
-    private final Set<String> tags;
+    private final GencodeMetadata gencodeMetadata;
 
-    protected GencodeBaseTranscript(GenomicRegion location,
-                                    TranscriptIdentifier id,
-                                    Biotype biotype,
-                                    EvidenceLevel evidenceLevel,
-                                    List<Coordinates> exons,
-                                    Set<String> tags) {
+    GencodeBaseTranscript(TranscriptIdentifier id,
+                          GenomicRegion location,
+                          List<Coordinates> exons,
+                          GencodeMetadata gencodeMetadata) {
         super(id, location, exons);
-        this.biotype = Objects.requireNonNull(biotype, "Biotype must not be null");
-        this.evidenceLevel = Objects.requireNonNull(evidenceLevel, "Evidence level must not be null");
-        this.tags = Objects.requireNonNull(tags, "Tags must not be null");
-
+        this.gencodeMetadata = Objects.requireNonNull(gencodeMetadata, "Gencode metadata must not be null");
     }
 
     @Override
-    public Biotype biotype() {
-        return biotype;
-    }
-
-    @Override
-    public EvidenceLevel evidenceLevel() {
-        return evidenceLevel;
-    }
-
-    @Override
-    public Set<String> tags() {
-        return tags;
+    public GencodeMetadata gencodeMetadata() {
+        return gencodeMetadata;
     }
 
     @Override
@@ -52,20 +33,18 @@ abstract class GencodeBaseTranscript extends BaseTranscript implements GencodeTr
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         GencodeBaseTranscript that = (GencodeBaseTranscript) o;
-        return biotype == that.biotype && evidenceLevel == that.evidenceLevel && Objects.equals(tags, that.tags);
+        return Objects.equals(gencodeMetadata, that.gencodeMetadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), biotype, evidenceLevel, tags);
+        return Objects.hash(super.hashCode(), gencodeMetadata);
     }
 
     @Override
     public String toString() {
         return "GencodeBaseTranscript{" +
-                "biotype=" + biotype +
-                ", evidenceLevel=" + evidenceLevel +
-                ", tags=" + tags +
-                '}';
+                "gencodeMetadata=" + gencodeMetadata +
+                "} " + super.toString();
     }
 }

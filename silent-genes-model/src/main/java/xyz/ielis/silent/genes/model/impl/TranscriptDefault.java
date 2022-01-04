@@ -3,6 +3,7 @@ package xyz.ielis.silent.genes.model.impl;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
 import xyz.ielis.silent.genes.model.TranscriptIdentifier;
+import xyz.ielis.silent.genes.model.base.BaseTranscript;
 
 import java.util.List;
 

@@ -1,39 +1,23 @@
 package xyz.ielis.silent.genes.model.impl;
 
 import org.monarchinitiative.svart.GenomicRegion;
-import xyz.ielis.silent.genes.model.Gene;
 import xyz.ielis.silent.genes.model.GeneIdentifier;
 import xyz.ielis.silent.genes.model.Transcript;
+import xyz.ielis.silent.genes.model.base.BaseGene;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-public class GeneDefault implements Gene {
+public class GeneDefault extends BaseGene {
 
-    private final GeneIdentifier id;
-    private final GenomicRegion location;
-    private final Set<? extends Transcript> transcripts;
+    private final List<? extends Transcript> transcripts;
 
     public GeneDefault(GeneIdentifier id,
                        GenomicRegion location,
-                       Collection<? extends Transcript> transcripts) {
-        this.id = Objects.requireNonNull(id, "ID must not be null");
-        this.location = Objects.requireNonNull(location, "Location must not be null");
-        this.transcripts = Set.copyOf(Objects.requireNonNull(transcripts, "Transcripts must not be null"));
+                       List<? extends Transcript> transcripts) {
+        super(id, location);
+        this.transcripts = Objects.requireNonNull(transcripts, "Transcripts must not be null");
         if (this.transcripts.isEmpty())
             throw new IllegalArgumentException("Transcripts must not be empty");
-    }
-
-    @Override
-    public GeneIdentifier id() {
-        return id;
-    }
-
-    @Override
-    public GenomicRegion location() {
-        return location;
     }
 
     @Override

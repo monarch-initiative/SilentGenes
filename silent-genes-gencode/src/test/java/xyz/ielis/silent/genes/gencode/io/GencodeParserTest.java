@@ -94,8 +94,8 @@ public class GencodeParserTest {
 
             Map<String, Coordinates> cdsCoordinates = fbn1.codingTranscripts()
                     .collect(Collectors.toMap(Identified::accession, Coding::cdsCoordinates));
-
-            assertThat(cdsCoordinates, hasEntry("ENST123blabla", Coordinates.of(CoordinateSystem.zeroBased(), 1, 2)));
+            assertThat(cdsCoordinates, hasEntry("ENST00000560355.1", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_346_588)));
+            assertThat(cdsCoordinates, hasEntry("ENST00000316623.10", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_580_200)));
 
 
             // ----------------------------------------- SURF2 on scaffold ----------------------------------------------

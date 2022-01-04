@@ -4,7 +4,7 @@ import xyz.ielis.silent.genes.model.Identifier;
 
 import java.util.Objects;
 
-class IdentifierDefault implements Identifier {
+abstract class IdentifierDefault implements Identifier {
 
     private final String accession;
     private final String symbol;

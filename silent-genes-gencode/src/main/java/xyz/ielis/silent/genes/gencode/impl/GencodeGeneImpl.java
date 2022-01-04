@@ -1,58 +1,49 @@
 package xyz.ielis.silent.genes.gencode.impl;
 
 import org.monarchinitiative.svart.GenomicRegion;
-import xyz.ielis.silent.genes.gencode.model.Biotype;
-import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
-import xyz.ielis.silent.genes.gencode.model.GencodeGene;
-import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
+import xyz.ielis.silent.genes.gencode.model.*;
 import xyz.ielis.silent.genes.model.GeneIdentifier;
-import xyz.ielis.silent.genes.model.impl.GeneDefault;
+import xyz.ielis.silent.genes.model.base.BaseGene;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-public class GencodeGeneImpl extends GeneDefault implements GencodeGene {
+public class GencodeGeneImpl extends BaseGene implements GencodeGene {
 
-    private final Biotype biotype;
-    private final EvidenceLevel evidenceLevel;
-    private final Set<String> tags;
+    private final List<? extends GencodeTranscript> transcripts;
+    private final GencodeMetadata gencodeMetadata;
 
-    public static GencodeGeneImpl of(GenomicRegion location,
-                                     GeneIdentifier id,
-                                     Biotype biotype,
-                                     EvidenceLevel evidenceLevel,
-                                     Collection<GencodeTranscript> transcripts,
-                                     Collection<String> tags) {
-        return new GencodeGeneImpl(id, biotype, evidenceLevel, location, Set.copyOf(transcripts), Set.copyOf(tags));
+    public static GencodeGeneImpl of(GeneIdentifier id,
+                                     GenomicRegion location,
+                                     List<GencodeTranscript> transcripts,
+                                     GencodeMetadata gencodeMetadata) {
+        return new GencodeGeneImpl(id, location, transcripts, gencodeMetadata);
     }
 
     private GencodeGeneImpl(GeneIdentifier id,
-                            Biotype biotype,
-                            EvidenceLevel evidenceLevel,
                             GenomicRegion location,
-                            Set<GencodeTranscript> transcripts,
-                            Set<String> tags) {
-        super(id, location, transcripts);
-        this.biotype = Objects.requireNonNull(biotype, "Biotype must not be null");
-        this.evidenceLevel = Objects.requireNonNull(evidenceLevel, "Evidence level must not be null");
-        this.tags = Objects.requireNonNull(tags, "Tags must not be empty");
+                            List<GencodeTranscript> transcripts,
+                            GencodeMetadata gencodeMetadata) {
+        super(id, location);
+        this.transcripts = Objects.requireNonNull(transcripts, "Transcripts must not be null");
+        if (this.transcripts.isEmpty())
+            throw new IllegalArgumentException("Transcripts must not be empty");
+        this.gencodeMetadata = Objects.requireNonNull(gencodeMetadata, "Gencode metadata must not be null");
+
     }
 
     @Override
-    public Biotype biotype() {
-        return biotype;
+    public GencodeMetadata gencodeMetadata() {
+        return gencodeMetadata;
     }
 
     @Override
-    public EvidenceLevel evidenceLevel() {
-        return evidenceLevel;
+    public Iterator<? extends GencodeTranscript> transcripts() {
+        return transcripts.iterator();
     }
 
     @Override
-    public Set<String> tags() {
-        return tags;
+    public int transcriptCount() {
+        return transcripts.size();
     }
 
     @Override
@@ -61,20 +52,19 @@ public class GencodeGeneImpl extends GeneDefault implements GencodeGene {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         GencodeGeneImpl that = (GencodeGeneImpl) o;
-        return biotype == that.biotype && evidenceLevel == that.evidenceLevel && Objects.equals(tags, that.tags);
+        return Objects.equals(transcripts, that.transcripts) && Objects.equals(gencodeMetadata, that.gencodeMetadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), biotype, evidenceLevel, tags);
+        return Objects.hash(super.hashCode(), transcripts, gencodeMetadata);
     }
 
     @Override
     public String toString() {
         return "GencodeGeneImpl{" +
-                "biotype=" + biotype +
-                ", evidenceLevel=" + evidenceLevel +
-                ", tags=" + tags +
-                '}';
+                "transcripts=" + transcripts +
+                ", gencodeMetadata=" + gencodeMetadata +
+                "} " + super.toString();
     }
 }
