@@ -71,7 +71,7 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_352_060, 133_352_142).invert(contig),
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_757, 133_351_982).invert(contig)
                 );
-        Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_913, 133_356_453);
+        Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_356_453).invert(contig);
         return Transcript.coding(txId, location, exons, cdsCoordinates);
     }
 
@@ -89,7 +89,7 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_804, 133_351_982).invert(contig)
         );
 
-        Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_913, 133_353_936);
+        Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_353_936).invert(contig);
 
         return Transcript.coding(txId, location, exons, cdsCoordinates);
     }

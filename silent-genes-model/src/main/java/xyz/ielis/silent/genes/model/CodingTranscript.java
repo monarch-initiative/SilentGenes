@@ -13,9 +13,10 @@ public interface CodingTranscript extends Coding, Transcript {
         List<Coordinates> utrCoordinates = new ArrayList<>(exons().size());
         int cdsStart = cdsCoordinates().startWithCoordinateSystem(CoordinateSystem.zeroBased());
         for (Coordinates exon : exons()) {
-            if (cdsStart >= exon.startWithCoordinateSystem(CoordinateSystem.zeroBased())) {
+            if (exon.endWithCoordinateSystem(CoordinateSystem.zeroBased()) > cdsStart) {
                 if (cdsStart != exon.startWithCoordinateSystem(CoordinateSystem.zeroBased())) {
-                    utrCoordinates.add(Coordinates.of(coordinateSystem(), exon.start(), cdsCoordinates().startWithCoordinateSystem(CoordinateSystem.zeroBased())));
+                    Coordinates coordinates = Coordinates.of(CoordinateSystem.zeroBased(), exon.startWithCoordinateSystem(CoordinateSystem.zeroBased()), cdsStart);
+                    utrCoordinates.add(coordinates);
                 }
                 break;
             } else {
@@ -33,7 +34,8 @@ public interface CodingTranscript extends Coding, Transcript {
         for (int i = exons.size() - 1; i >= 0; i--) {
             Coordinates exon = exons.get(i);
             if (cdsEnd > exon.startWithCoordinateSystem(CoordinateSystem.zeroBased())) {
-                utrCoordinates.add(Coordinates.of(CoordinateSystem.zeroBased(), cdsEnd, exon.end()));
+                utrCoordinates.add(Coordinates.of(CoordinateSystem.zeroBased(), cdsEnd, exon.endWithCoordinateSystem(CoordinateSystem.zeroBased())));
+                break;
             } else {
                 utrCoordinates.add(exon);
             }
@@ -42,15 +44,4 @@ public interface CodingTranscript extends Coding, Transcript {
 
         return utrCoordinates;
     }
-
-    //   |------------|
-    //     |-------|
-    //   0,1,2
-    //   1,2,3,...,
-    ///  0,1,2,...,9,10
-    ///
-    //  (0,10)  fully open
-    //  [1,9]  fully closed
-    //  (0,9]  left open
-    //  [1,10) right open <-- THE ONE
 }

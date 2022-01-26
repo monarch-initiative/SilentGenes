@@ -97,7 +97,6 @@ public class GencodeParserTest {
             assertThat(cdsCoordinates, hasEntry("ENST00000560355.1", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_346_588)));
             assertThat(cdsCoordinates, hasEntry("ENST00000316623.10", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_580_200)));
 
-
             // ----------------------------------------- SURF2 on scaffold ----------------------------------------------
             GencodeGene surf2OnScaffold = genes.get(2);
             // Location stuff
