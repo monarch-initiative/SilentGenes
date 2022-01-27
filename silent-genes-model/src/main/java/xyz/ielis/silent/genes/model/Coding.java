@@ -13,9 +13,16 @@ import java.util.List;
  */
 public interface Coding {
 
-    Coordinates startCodon();
 
-    Coordinates stopCodon();
+    Coordinates cdsCoordinates();
+
+    default Coordinates startCodon() {
+        return Coordinates.of(cdsCoordinates().coordinateSystem(), cdsCoordinates().start(), cdsCoordinates().end() + 3);
+    }
+
+    default Coordinates stopCodon() {
+        return Coordinates.of(cdsCoordinates().coordinateSystem(), cdsCoordinates().end() - 3, cdsCoordinates().end());
+    }
 
     default int codingStart() {
         return startCodon().start();

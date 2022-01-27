@@ -39,10 +39,8 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_360_264, 133_360_434),
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_361_055, 133_361_158)
         );
-        Coordinates startCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_592, 133_356_595);
-        Coordinates stopCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_361_136, 133_361_139);
 
-        return Transcript.coding(txId, location, exons, startCds, stopCds);
+        return Transcript.coding(txId, location, exons, location.coordinates());
     }
 
     // ------------------------------------------------- FBN1 ----------------------------------------------------------
@@ -56,7 +54,6 @@ public class Genes {
         Transcript surf1_201 = surf1_201(contig);
         Transcript surf1_205 = surf1_205(contig);
         List<Transcript> transcripts = List.of(surf1_201, surf1_205);
-
         return Gene.of(id, location, transcripts);
     }
 
@@ -74,10 +71,8 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_352_060, 133_352_142).invert(contig),
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_757, 133_351_982).invert(contig)
                 );
-        Coordinates startCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_450, 133_356_453).invert(contig);
-        Coordinates stopCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_351_915).invert(contig);
-
-        return Transcript.coding(txId, location, exons, startCds, stopCds);
+        Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_356_453).invert(contig);
+        return Transcript.coding(txId, location, exons, cdsCoordinates);
     }
 
     public static Transcript surf1_205(Contig contig) {
@@ -93,10 +88,10 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_352_060, 133_352_142).invert(contig),
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_804, 133_351_982).invert(contig)
         );
-        Coordinates startCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_356_450, 133_356_453).invert(contig);
-        Coordinates stopCds = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_351_915).invert(contig);
 
-        return Transcript.coding(txId, location, exons, startCds, stopCds);
+        Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_353_936).invert(contig);
+
+        return Transcript.coding(txId, location, exons, cdsCoordinates);
     }
 
 }

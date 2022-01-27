@@ -50,7 +50,8 @@ public class JsonGeneParserTest {
         assertThat(deserialized, equalTo(payload));
     }
 
-    //@Test
+    @Test
+    @Disabled
     // Used to generate the paylod to compare with in deserialize test.
     public void dump() throws Exception {
         List<Gene> genes = List.of(Genes.surf1(), Genes.surf2());

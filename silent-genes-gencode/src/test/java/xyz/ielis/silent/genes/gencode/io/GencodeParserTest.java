@@ -2,17 +2,19 @@ package xyz.ielis.silent.genes.gencode.io;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.monarchinitiative.svart.CoordinateSystem;
-import org.monarchinitiative.svart.GenomicAssemblies;
-import org.monarchinitiative.svart.GenomicAssembly;
-import org.monarchinitiative.svart.Strand;
+import org.monarchinitiative.svart.*;
 import xyz.ielis.silent.genes.gencode.model.Biotype;
 import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
+import xyz.ielis.silent.genes.model.Coding;
+import xyz.ielis.silent.genes.model.CodingTranscript;
+import xyz.ielis.silent.genes.model.Identified;
+import xyz.ielis.silent.genes.model.Transcript;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -79,6 +81,7 @@ public class GencodeParserTest {
             assertThat(fbn1.start(), equalTo(53_345_469));
             assertThat(fbn1.end(), equalTo(53_582_877));
 
+
             // ID stuff
             assertThat(fbn1.accession(), equalTo("ENSG00000166147.15"));
             assertThat(fbn1.symbol(), equalTo("FBN1"));
@@ -88,6 +91,11 @@ public class GencodeParserTest {
 
             assertThat(fbn1.biotype(), equalTo(Biotype.protein_coding));
             assertThat(fbn1.tags(), hasItems("overlapping_locus"));
+
+            Map<String, Coordinates> cdsCoordinates = fbn1.codingTranscripts()
+                    .collect(Collectors.toMap(Identified::accession, Coding::cdsCoordinates));
+            assertThat(cdsCoordinates, hasEntry("ENST00000560355.1", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_346_588)));
+            assertThat(cdsCoordinates, hasEntry("ENST00000316623.10", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_580_200)));
 
             // ----------------------------------------- SURF2 on scaffold ----------------------------------------------
             GencodeGene surf2OnScaffold = genes.get(2);

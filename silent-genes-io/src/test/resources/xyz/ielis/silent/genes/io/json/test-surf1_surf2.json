@@ -51,12 +51,8 @@
       "start" : 5042735,
       "end" : 5042960
     } ],
-    "startCodon" : {
+    "cdsCoordinates" : {
       "start" : 5038264,
-      "end" : 5038267
-    },
-    "stopCodon" : {
-      "start" : 5042802,
       "end" : 5042805
     }
   }, {
@@ -96,12 +92,8 @@
       "start" : 5042735,
       "end" : 5042913
     } ],
-    "startCodon" : {
-      "start" : 5038264,
-      "end" : 5038267
-    },
-    "stopCodon" : {
-      "start" : 5042802,
+    "cdsCoordinates" : {
+      "start" : 5040781,
       "end" : 5042805
     }
   } ]
@@ -149,13 +141,9 @@
       "start" : 133361055,
       "end" : 133361158
     } ],
-    "startCodon" : {
-      "start" : 133356592,
-      "end" : 133356595
-    },
-    "stopCodon" : {
-      "start" : 133361136,
-      "end" : 133361139
+    "cdsCoordinates" : {
+      "start" : 133356549,
+      "end" : 133361158
     }
   } ]
 } ]
