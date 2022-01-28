@@ -1,6 +1,5 @@
 package xyz.ielis.silent.genes.cli;
 
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPOutputStream;
 
 @CommandLine.Command(name = "parse-gencode",
         aliases = {"G"},
@@ -83,7 +83,7 @@ public class ParseGencodeCommand implements Callable<Integer> {
 
     private static OutputStream openOutputForWriting(Path outputPath) throws IOException {
         if (outputPath.toFile().getName().endsWith(".gz"))
-            return new BufferedOutputStream(new GzipCompressorOutputStream(Files.newOutputStream(outputPath)));
+            return new BufferedOutputStream(new GZIPOutputStream(Files.newOutputStream(outputPath)));
         else
             return Files.newOutputStream(outputPath);
     }

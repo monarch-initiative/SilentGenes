@@ -17,10 +17,6 @@
             <artifactId>silent-genes-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
