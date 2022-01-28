@@ -35,7 +35,7 @@ public class GtfRecordParserTest {
 
         assertThat(record.contigName(), equalTo("1"));
         assertThat(record.strand(), equalTo(Strand.NEGATIVE));
-        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.FULLY_CLOSED));
+        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.oneBased()));
         assertThat(record.start(), equalTo(248_938_987));
         assertThat(record.end(), equalTo(248_939_054));
     }
@@ -56,7 +56,7 @@ public class GtfRecordParserTest {
 
         assertThat(record.contigName(), equalTo("1"));
         assertThat(record.strand(), equalTo(Strand.POSITIVE));
-        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.FULLY_CLOSED));
+        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.oneBased()));
         assertThat(record.start(), equalTo(12_010));
         assertThat(record.end(), equalTo(13_670));
 
@@ -80,7 +80,7 @@ public class GtfRecordParserTest {
 
         assertThat(record.contigName(), equalTo("1"));
         assertThat(record.strand(), equalTo(Strand.NEGATIVE));
-        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.FULLY_CLOSED));
+        assertThat(record.coordinateSystem(), equalTo(CoordinateSystem.oneBased()));
         assertThat(record.start(), equalTo(91_255_838));
         assertThat(record.end(), equalTo(91_255_964));
 
