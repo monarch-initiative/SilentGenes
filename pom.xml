@@ -38,7 +38,7 @@
         <guava.version>31.0.1-jre</guava.version>
         <commons-compress.version>1.21</commons-compress.version>
         <picocli.version>4.6.2</picocli.version>
-        <slf4j.version>1.7.32</slf4j.version>
+        <slf4j.version>1.7.35</slf4j.version>
     </properties>
 
     <developers>
