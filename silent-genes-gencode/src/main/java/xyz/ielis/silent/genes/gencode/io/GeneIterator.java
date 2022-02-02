@@ -1,17 +1,14 @@
 package xyz.ielis.silent.genes.gencode.io;
 
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.ielis.silent.genes.gencode.impl.CodingTranscript;
+import xyz.ielis.silent.genes.gencode.impl.GencodeCodingTranscript;
 import xyz.ielis.silent.genes.gencode.impl.GencodeGeneImpl;
-import xyz.ielis.silent.genes.gencode.impl.NoncodingTranscript;
-import xyz.ielis.silent.genes.gencode.model.Biotype;
-import xyz.ielis.silent.genes.gencode.model.EvidenceLevel;
-import xyz.ielis.silent.genes.gencode.model.GencodeGene;
-import xyz.ielis.silent.genes.gencode.model.GencodeTranscript;
+import xyz.ielis.silent.genes.gencode.impl.GencodeNoncodingTranscript;
+import xyz.ielis.silent.genes.gencode.model.*;
 import xyz.ielis.silent.genes.model.GeneIdentifier;
 import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 
@@ -20,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 public class GeneIterator implements Iterator<GencodeGene> {
 
@@ -54,7 +52,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
         LOGGER.debug("Opening Gencode GTF file at `{}`", path.toAbsolutePath());
         if (path.toFile().getName().endsWith(".gz")) {
             LOGGER.debug("Assuming the file is GZipped");
-            return new BufferedReader(new InputStreamReader(new GzipCompressorInputStream(new FileInputStream(path.toFile()))));
+            return new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(path.toFile()))));
         } else {
             LOGGER.debug("Opening GTF as a plain text");
             return Files.newBufferedReader(path);
@@ -78,12 +76,14 @@ public class GeneIterator implements Iterator<GencodeGene> {
                     gene = record;
                     break;
                 case TRANSCRIPT:
+                    // "transcript_id", "transcript_type", "transcript_name", "level"
                     if (!record.attributes().containsAll(MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES)) {
                         return reportMissingAttributesAndReturn(record, MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES);
                     }
                     transcripts.add(record);
                     break;
                 case EXON:
+                    // "transcript_id", "exon_id", "exon_number"
                     if (!record.attributes().containsAll(MANDATORY_EXON_ATTRIBUTE_NAMES)) {
                         return reportMissingAttributesAndReturn(record, MANDATORY_EXON_ATTRIBUTE_NAMES);
                     }
@@ -117,7 +117,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-        // id, type, status, name, tags
+        // gene_type, gene_name, level
         if (!gene.attributes().containsAll(MANDATORY_GENE_ATTRIBUTE_NAMES)) {
             return reportMissingAttributesAndReturn(gene, MANDATORY_GENE_ATTRIBUTE_NAMES);
         }
@@ -126,17 +126,11 @@ public class GeneIterator implements Iterator<GencodeGene> {
         String hgncId = gene.attribute("hgnc_id");
         GeneIdentifier geneIdentifier = GeneIdentifier.of(geneId, gene.attribute("gene_name"), hgncId, NCBI_GENE_ID_IS_NA);
 
-        Optional<Biotype> biotype = parseBiotype(gene.attribute("gene_type"));
-        if (biotype.isEmpty()) {
-            LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", gene.attribute("gene_name"), geneId);
-            return Optional.empty();
-        }
+        // type, status, tags
+        Optional<GencodeMetadata> gencodeMetadata = parseGeneMetadata(geneId, gene);
 
-        Optional<EvidenceLevel> evidenceLevel = parseEvidenceLevel(gene.attribute("level"));
-        if (evidenceLevel.isEmpty()) {
-            LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", gene.attribute("level"), geneId);
+        if (gencodeMetadata.isEmpty())
             return Optional.empty();
-        }
 
         // transcripts
         List<GencodeTranscript> txs = new ArrayList<>(transcripts.size());
@@ -153,7 +147,22 @@ public class GeneIterator implements Iterator<GencodeGene> {
             return Optional.empty();
         }
 
-        return Optional.of(GencodeGeneImpl.of(gene.location(), geneIdentifier, biotype.get(), evidenceLevel.get(), txs, gene.tags()));
+        return Optional.of(GencodeGeneImpl.of(geneIdentifier, gene.location(), txs, gencodeMetadata.get()));
+    }
+
+    private static Optional<GencodeMetadata> parseGeneMetadata(String geneId, GtfRecord gene) {
+        Optional<Biotype> biotype = parseBiotype(gene.attribute("gene_type"));
+        if (biotype.isEmpty()) {
+            LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", gene.attribute("gene_name"), geneId);
+            return Optional.empty();
+        }
+
+        Optional<EvidenceLevel> evidenceLevel = parseEvidenceLevel(gene.attribute("level"));
+        if (evidenceLevel.isEmpty()) {
+            LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", gene.attribute("level"), geneId);
+            return Optional.empty();
+        }
+        return Optional.of(GencodeMetadata.of(biotype.get(), evidenceLevel.get(), gene.tags()));
     }
 
     private static Optional<GencodeTranscript> processTranscript(String txId,
@@ -161,6 +170,39 @@ public class GeneIterator implements Iterator<GencodeGene> {
                                                                  List<GtfRecord> exonRecords,
                                                                  GtfRecord startCodon,
                                                                  GtfRecord stopCodon) {
+        TranscriptIdentifier txIdentifier = TranscriptIdentifier.of(txId, tx.attribute("transcript_name"), tx.attribute("ccdsid"));
+
+        Optional<GencodeMetadata> gencodeMetadata = parseTranscriptMetadata(txId, tx);
+        if (gencodeMetadata.isEmpty())
+            return Optional.empty();
+
+        List<Coordinates> exons = processExons(exonRecords);
+
+        // assemble the transcript
+        if (startCodon == null && stopCodon == null) {
+            // should be non-coding transcript
+            return Optional.of(GencodeNoncodingTranscript.of(txIdentifier, tx.location(), exons, gencodeMetadata.get()));
+        } else {
+            // should be coding transcript
+            if (startCodon == null || stopCodon == null) {
+                if (startCodon == null) {
+                    LOGGER.warn("Start codon is missing for transcript `{}`: {}", txId, tx);
+                } else {
+                    LOGGER.warn("Stop codon is missing for transcript `{}`: {}", txId, tx);
+                }
+                return Optional.empty();
+            } else {
+                // it does not really matter what coordinate system we use as long as we get the coordinates right
+                CoordinateSystem cs = tx.location().coordinateSystem();
+                Coordinates cds = Coordinates.of(cs,
+                        startCodon.startWithCoordinateSystem(cs),
+                        stopCodon.endWithCoordinateSystem(cs));
+                return Optional.of(GencodeCodingTranscript.of(txIdentifier, tx.location(), exons, cds, gencodeMetadata.get()));
+            }
+        }
+    }
+
+    private static Optional<GencodeMetadata> parseTranscriptMetadata(String txId, GtfRecord tx) {
         Optional<EvidenceLevel> level = parseEvidenceLevel(tx.attribute("level"));
         if (level.isEmpty()) {
             LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", tx.attribute("level"), txId);
@@ -172,25 +214,8 @@ public class GeneIterator implements Iterator<GencodeGene> {
             LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", tx.attribute("gene_name"), txId);
             return Optional.empty();
         }
-        TranscriptIdentifier txIdentifier = TranscriptIdentifier.of(txId, tx.attribute("transcript_name"), tx.attribute("ccdsid"));
-        List<Coordinates> exons = processExons(exonRecords);
 
-        if (startCodon == null && stopCodon == null) {
-            // should be non-coding transcript
-            return Optional.of(NoncodingTranscript.of(tx.location(), txIdentifier, biotype.get(), level.get(), exons, tx.tags()));
-        } else {
-            // should be coding transcript
-            if (startCodon == null || stopCodon == null) {
-                if (startCodon == null) {
-                    LOGGER.warn("Start codon is missing for transcript `{}`: {}", txId, tx);
-                } else {
-                    LOGGER.warn("Stop codon is missing for transcript `{}`: {}", txId, tx);
-                }
-                return Optional.empty();
-            } else {
-                return Optional.of(CodingTranscript.of(tx.location(), txIdentifier, startCodon.coordinates(), stopCodon.coordinates(), biotype.get(), level.get(), exons, tx.tags()));
-            }
-        }
+        return Optional.of(GencodeMetadata.of(biotype.get(), level.get(), tx.tags()));
     }
 
     private static Optional<Biotype> parseBiotype(String geneType) {
@@ -368,8 +393,7 @@ public class GeneIterator implements Iterator<GencodeGene> {
 
         return recordByGeneId.entrySet().stream()
                 .map(e -> assembleGene(e.getKey(), e.getValue()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toUnmodifiableList());
     }
 

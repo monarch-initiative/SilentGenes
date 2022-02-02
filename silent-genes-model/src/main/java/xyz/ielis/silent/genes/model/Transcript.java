@@ -2,7 +2,7 @@ package xyz.ielis.silent.genes.model;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
-import xyz.ielis.silent.genes.model.impl.CodingTranscript;
+import xyz.ielis.silent.genes.model.impl.CodingTranscriptDefault;
 import xyz.ielis.silent.genes.model.impl.TranscriptDefault;
 
 import java.util.List;
@@ -23,18 +23,17 @@ public interface Transcript extends Located, Identified<TranscriptIdentifier> {
         return TranscriptDefault.of(id, location, exons);
     }
 
-    static Transcript coding(TranscriptIdentifier id,
+    static CodingTranscript coding(TranscriptIdentifier id,
                              GenomicRegion location,
                              List<Coordinates> exons,
-                             Coordinates startCodon,
-                             Coordinates stopCodon) {
-        return CodingTranscript.of(id, location, exons, startCodon, stopCodon);
+                             Coordinates cdsCoordinates) {
+        return CodingTranscriptDefault.of(id, location, exons, cdsCoordinates);
     }
 
     List<Coordinates> exons();
 
     default boolean isCoding() {
-        return this instanceof Coding;
+        return this instanceof CodingTranscript;
     }
 
 }

@@ -1,4 +1,4 @@
-package xyz.ielis.silent.genes.model.impl;
+package xyz.ielis.silent.genes.model.base;
 
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
@@ -8,7 +8,7 @@ import xyz.ielis.silent.genes.model.TranscriptIdentifier;
 import java.util.List;
 import java.util.Objects;
 
-abstract class BaseTranscript implements Transcript {
+public abstract class BaseTranscript implements Transcript {
 
     private final TranscriptIdentifier id;
     private final GenomicRegion location;

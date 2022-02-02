@@ -41,11 +41,10 @@ public class TranscriptDeserializer extends StdDeserializer<Transcript> {
             exons.add(codec.treeToValue(exonIterator.next(), Coordinates.class));
         }
 
-        if (node.hasNonNull("startCodon") && node.hasNonNull("stopCodon")) {
+        if (node.hasNonNull("cdsCoordinates")) {
             // coding transcript
-            Coordinates startCodon = codec.treeToValue(node.get("startCodon"), Coordinates.class);
-            Coordinates stopCodon = codec.treeToValue(node.get("stopCodon"), Coordinates.class);
-            return Transcript.coding(id, location, exons, startCodon, stopCodon);
+            Coordinates cdsCoordinates = codec.treeToValue(node.get("cdsCoordinates"), Coordinates.class);
+            return Transcript.coding(id, location, exons, cdsCoordinates);
         }
 
         // non-coding transcript
