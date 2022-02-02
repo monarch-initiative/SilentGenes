@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>SilentGenes</artifactId>
-        <groupId>xyz.ielis.silent.genes</groupId>
+        <groupId>org.monarchinitiative.sgenes</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>xyz.ielis.silent.genes</groupId>
+            <groupId>org.monarchinitiative.sgenes</groupId>
             <artifactId>silent-genes-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
@@ -23,7 +23,7 @@
         </dependency>
 
         <dependency>
-            <groupId>xyz.ielis.silent.genes</groupId>
+            <groupId>org.monarchinitiative.sgenes</groupId>
             <artifactId>silent-genes-simple</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
