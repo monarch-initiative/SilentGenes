@@ -1,8 +1,8 @@
 package xyz.ielis.silent.genes.io.json;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.monarchinitiative.svart.*;
+import org.monarchinitiative.svart.assembly.GenomicAssemblies;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import xyz.ielis.silent.genes.model.Gene;
 import xyz.ielis.silent.genes.simple.Genes;
 

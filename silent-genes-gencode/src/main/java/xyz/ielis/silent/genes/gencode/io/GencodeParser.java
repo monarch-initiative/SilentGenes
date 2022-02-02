@@ -1,6 +1,6 @@
 package xyz.ielis.silent.genes.gencode.io;
 
-import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import xyz.ielis.silent.genes.gencode.model.GencodeGene;
 
 import java.nio.file.Path;

@@ -2,7 +2,7 @@ package xyz.ielis.silent.genes.jannovar;
 
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.svart.CoordinateSystem;
-import org.monarchinitiative.svart.GenomicAssemblies;
+import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.Strand;
 import xyz.ielis.silent.genes.model.Gene;
 import xyz.ielis.silent.genes.model.Identified;
@@ -53,7 +53,7 @@ public class JannovarParserTest {
         Gene surf1 = genes.get("SURF1");
         assertThat(surf1.contigName(), equalTo("9"));
         assertThat(surf1.strand(), equalTo(Strand.NEGATIVE));
-        assertThat(surf1.coordinateSystem(), equalTo(CoordinateSystem.LEFT_OPEN));
+        assertThat(surf1.coordinateSystem(), equalTo(CoordinateSystem.zeroBased()));
         assertThat(surf1.start(), equalTo(5_038_232));
         assertThat(surf1.end(), equalTo(5_042_913));
 
