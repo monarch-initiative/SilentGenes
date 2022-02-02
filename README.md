@@ -2,7 +2,7 @@
 
 ![Java CI with Maven](https://github.com/ielis/SilentGenes/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-The silent companion library for performing genome arithmetics with genes and transcripts using [Svart](https://github.com/exomiser/svart). 
+"Silent companion" library for performing genome arithmetics with genes and transcripts using [Svart](https://github.com/exomiser/svart). 
 
 _Silent genes_ works with Java 11 or better.
 
