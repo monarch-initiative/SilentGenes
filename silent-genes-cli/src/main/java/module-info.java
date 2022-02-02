@@ -1,9 +1,9 @@
-module xyz.ielis.silent.genes.cli {
-    requires xyz.ielis.silent.genes.io;
-    requires xyz.ielis.silent.genes.gencode;
+module org.monarchinitiative.sgenes.cli {
+    requires org.monarchinitiative.sgenes.io;
+    requires org.monarchinitiative.sgenes.gencode;
 
     requires info.picocli;
     requires org.slf4j;
 
-    opens xyz.ielis.silent.genes.cli to info.picocli;
+    opens org.monarchinitiative.sgenes.cli to info.picocli;
 }

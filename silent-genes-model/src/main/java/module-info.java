@@ -1,6 +1,6 @@
-module xyz.ielis.silent.genes.model {
+module org.monarchinitiative.sgenes.model {
     requires transitive org.monarchitiative.svart;
 
-    exports xyz.ielis.silent.genes.model;
-    exports xyz.ielis.silent.genes.model.base;
+    exports org.monarchinitiative.sgenes.model;
+    exports org.monarchinitiative.sgenes.model.base;
 }

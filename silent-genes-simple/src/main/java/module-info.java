@@ -1,5 +1,5 @@
-module xyz.ielis.silent.genes.simple {
-    requires transitive xyz.ielis.silent.genes.model;
+module org.monarchinitiative.sgenes.simple {
+    requires transitive org.monarchinitiative.sgenes.model;
 
-    exports xyz.ielis.silent.genes.simple;
+    exports org.monarchinitiative.sgenes.simple;
 }

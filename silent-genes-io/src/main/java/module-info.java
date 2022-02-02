@@ -1,8 +1,8 @@
-module xyz.ielis.silent.genes.io {
-    requires transitive xyz.ielis.silent.genes.model;
+module org.monarchinitiative.sgenes.io {
+    requires transitive org.monarchinitiative.sgenes.model;
 
     requires com.fasterxml.jackson.databind;
     requires org.slf4j;
 
-    exports xyz.ielis.silent.genes.io;
+    exports org.monarchinitiative.sgenes.io;
 }
