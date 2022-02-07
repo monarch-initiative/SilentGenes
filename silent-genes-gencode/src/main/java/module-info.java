@@ -1,7 +1,7 @@
-module xyz.ielis.silent.genes.gencode {
-    requires transitive xyz.ielis.silent.genes.model;
+module org.monarchinitiative.sgenes.gencode {
+    requires transitive org.monarchinitiative.sgenes.model;
     requires org.slf4j;
 
-    exports xyz.ielis.silent.genes.gencode.model;
-    exports xyz.ielis.silent.genes.gencode.io;
+    exports org.monarchinitiative.sgenes.gencode.model;
+    exports org.monarchinitiative.sgenes.gencode.io;
 }

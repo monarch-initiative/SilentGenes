@@ -1,8 +1,8 @@
-module xyz.ielis.silent.genes.jannovar {
-    requires transitive xyz.ielis.silent.genes.model;
+module org.monarchinitiative.sgenes.jannovar {
+    requires transitive org.monarchinitiative.sgenes.model;
     requires jannovar.core;
     requires com.google.common;
     requires org.slf4j;
 
-    exports xyz.ielis.silent.genes.jannovar;
+    exports org.monarchinitiative.sgenes.jannovar;
 }
