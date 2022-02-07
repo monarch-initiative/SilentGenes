@@ -2,7 +2,7 @@ package xyz.ielis.silent.genes.jannovar;
 
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.svart.CoordinateSystem;
-import org.monarchinitiative.svart.GenomicAssemblies;
+import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.Strand;
 import xyz.ielis.silent.genes.model.Gene;
 import xyz.ielis.silent.genes.model.Identified;

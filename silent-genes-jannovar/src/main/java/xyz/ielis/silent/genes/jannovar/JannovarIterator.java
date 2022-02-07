@@ -3,6 +3,7 @@ package xyz.ielis.silent.genes.jannovar;
 import de.charite.compbio.jannovar.data.JannovarData;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.svart.*;
 import xyz.ielis.silent.genes.model.*;
 

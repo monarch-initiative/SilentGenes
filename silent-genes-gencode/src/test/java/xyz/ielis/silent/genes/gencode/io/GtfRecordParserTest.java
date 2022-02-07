@@ -2,8 +2,8 @@ package xyz.ielis.silent.genes.gencode.io;
 
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.svart.CoordinateSystem;
-import org.monarchinitiative.svart.GenomicAssemblies;
-import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.assembly.GenomicAssemblies;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.svart.Strand;
 
 import java.util.Optional;

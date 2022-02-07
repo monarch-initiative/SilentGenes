@@ -1,6 +1,7 @@
 package xyz.ielis.silent.genes.gencode.io;
 
 import org.monarchinitiative.svart.*;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,8 +90,8 @@ class GtfRecordParser {
             if (strand.isPositive()) {
                 return Coordinates.of(COORDINATE_SYSTEM, start, end);
             } else {
-                int startOnNegative = Coordinates.invertPosition(COORDINATE_SYSTEM, contig, end);
-                int endOnNegative = Coordinates.invertPosition(COORDINATE_SYSTEM, contig, start);
+                int startOnNegative = Coordinates.invertCoordinate(COORDINATE_SYSTEM, contig, end);
+                int endOnNegative = Coordinates.invertCoordinate(COORDINATE_SYSTEM, contig, start);
                 return Coordinates.of(COORDINATE_SYSTEM, startOnNegative, endOnNegative);
             }
         } catch (NumberFormatException e) {

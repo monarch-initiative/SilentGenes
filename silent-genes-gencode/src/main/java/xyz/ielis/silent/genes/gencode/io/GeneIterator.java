@@ -2,7 +2,7 @@ package xyz.ielis.silent.genes.gencode.io;
 
 import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
-import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ielis.silent.genes.gencode.impl.GencodeCodingTranscript;
