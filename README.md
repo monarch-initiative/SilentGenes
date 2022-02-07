@@ -2,9 +2,9 @@
 
 ![Java CI with Maven](https://github.com/ielis/SilentGenes/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-"Silent companion" library for performing genome arithmetics with genes and transcripts using [Svart](https://github.com/exomiser/svart). 
+"Silent companion" library for performing genome arithmetics with genes and transcripts using _[Svart](https://github.com/exomiser/svart)_. 
 
-_Silent genes_ works with Java 11 or better.
+_Silent genes_ defines models of genes and transcripts. Transcript definitions can be sourced from [Gencode consortium](https://www.gencodegenes.org/), or [Jannovar](https://github.com/charite/jannovar). The definitions can be stored in JSON format. _Silent genes_ works with Java 11 or better.
 
 The project is currently in *pre-alpha* stage.
 
@@ -12,11 +12,11 @@ The project is currently in *pre-alpha* stage.
 
 *Silent genes* consists of several modules:
 
-- `silent-genes-model` defines basic data model of genes, transcripts, and IDs
-- `silent-genes-gencode` provides genes and transcripts as specified by [Gencode consortium](https://www.gencodegenes.org/),
-- `silent-genes-jannovar` provides genes and transcripts from the [Jannovar](https://github.com/charite/jannovar) transcript databases,
-- `silent-genes-io` for serializing `Gene`s and `Transcript`s into JSON to avoid the costly Q/C, and to allow faster parsing,  
-- `silent-genes-simple` to give a handful of real-life genes, mostly useful for unit testing
+- `silent-genes-model` provides a model of genes, transcripts, and their associated IDs,
+- `silent-genes-io` for serializing `Gene`s and `Transcript`s into JSON to avoid the costly Q/C, and to allow faster parsing,
+- `silent-genes-gencode` parses GTF file issued by [Gencode consortium](https://www.gencodegenes.org/) into a list of `Gene`s,
+- `silent-genes-jannovar` converts genes and transcripts from the [Jannovar](https://github.com/charite/jannovar) transcript databases into _Silent genes_ format, 
+- `silent-genes-simple` gives a handful of real-life genes, mostly useful for unit testing.
 
 ## Examples
 
