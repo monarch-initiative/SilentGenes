@@ -2,7 +2,9 @@
 
 ![Java CI with Maven](https://github.com/ielis/SilentGenes/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-A library that lets you silently work with genes and transcripts.
+"Silent companion" library for performing genome arithmetics with genes and transcripts using [Svart](https://github.com/exomiser/svart). 
+
+_Silent genes_ works with Java 11 or better.
 
 The project is currently in *pre-alpha* stage.
 
@@ -10,11 +12,11 @@ The project is currently in *pre-alpha* stage.
 
 *Silent genes* consists of several modules:
 
-- `silent-genes-model` defines the common properties of genes and transcripts,
+- `silent-genes-model` defines basic data model of genes, transcripts, and IDs
 - `silent-genes-gencode` provides genes and transcripts as specified by [Gencode consortium](https://www.gencodegenes.org/),
 - `silent-genes-jannovar` provides genes and transcripts from the [Jannovar](https://github.com/charite/jannovar) transcript databases,
-- `silent-genes-io` lets you serialize `Gene`s and `Transcript`s into JSON to avoid the costly Q/C and to allow faster parsing,  
-- `silent-genes-simple` gives you a handful of real-life genes, mostly useful for unit testing
+- `silent-genes-io` for serializing `Gene`s and `Transcript`s into JSON to avoid the costly Q/C, and to allow faster parsing,  
+- `silent-genes-simple` to give a handful of real-life genes, mostly useful for unit testing
 
 ## Examples
 
@@ -47,15 +49,31 @@ format is supported.
 @Test
 public void serializeGenesIntoCompressedJson() {
     List<Gene> genes = ... ; // start with a list of genes, e.g. from the example above
-    GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
-    GeneParserFactory factory = GeneParserFactory.of(assembly);
+    GeneParserFactory factory = GeneParserFactory.of(GenomicAssemblies.GRCh38p13());
     GeneParser parser = factory.forFormat(SerializationFormat.JSON);
 
     try (OutputStream os = new BufferedOutputStream(new GzipCompressorOutputStream(new FileOutputStream("genes.json.gz")))) {
         parser.write(genes, os);
     }
 }
-
 ```
 
 The `genes.json.gz` file with ~63k genes prepared above takes ~9MB of disk space.
+
+### Load the genes from compressed JSON
+
+Load the list of genes from the JSON file created above.
+
+```java
+@Test
+public void deserializeGenes() {
+    Path jsonPath = Path.of("genes.json.gz");
+    GeneParserFactory factory = GeneParserFactory.of(GenomicAssemblies.GRCh38p13());
+    GeneParser parser = factory.forFormat(SerializationFormat.JSON);
+
+    List<? extends Gene> genes;
+    try (InputStream is = new BufferedInputStream(new GZIPInputStream(Files.newInputStream(jsonPath)))) {
+        genes = parser.read(is);
+    }
+}
+```
