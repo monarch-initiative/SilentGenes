@@ -1,6 +1,6 @@
 # Silent genes
 
-![Java CI with Maven](https://github.com/ielis/SilentGenes/workflows/Java%20CI%20with%20Maven/badge.svg)
+[![Java CI with Maven](https://github.com/ielis/SilentGenes/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/ielis/SilentGenes/actions/workflows/maven.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.monarchinitiative.sgenes/SilentGenes/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.monarchinitiative.sgenes/SilentGenes)
 
 "Silent companion" library for performing genome arithmetics with genes and transcripts using _[Svart](https://github.com/exomiser/svart)_. 
