@@ -14,12 +14,42 @@ The project is currently in *pre-alpha* stage.
 *Silent genes* consists of several modules:
 
 - `silent-genes-model` provides a model of genes, transcripts, and their associated IDs,
-- `silent-genes-io` for serializing `Gene`s and `Transcript`s into JSON to avoid the costly Q/C, and to allow faster parsing,
-- `silent-genes-gencode` parses GTF file issued by [Gencode consortium](https://www.gencodegenes.org/) into a list of `Gene`s,
+- `silent-genes-io` for serializing `Gene`s and `Transcript`s in the internal data format into a JSON file to avoid the costly Q/C,
+- `silent-genes-gtf` parses GTF file issued by [Gencode consortium](https://www.gencodegenes.org/) or [NCBI Reference Sequence project](https://www.ncbi.nlm.nih.gov/refseq),
 - `silent-genes-jannovar` converts genes and transcripts from the [Jannovar](https://github.com/charite/jannovar) transcript databases into _Silent genes_ format, 
-- `silent-genes-simple` gives a handful of real-life genes, mostly useful for unit testing.
+- `silent-genes-simple` gives a handful of real-life genes, mostly useful for unit testing, and
+- `silent-genes-cli` command-line interface for converting genes into the internal data format.
 
-## Examples
+## Command-line interface (CLI)
+
+_Silent genes_ offeres CLI for converting gene and transcript definitions into the internal format. The following 
+sources of genes and transcripts are supported:
+
+- _Gencode_ (GTF) - genes provided by [Gencode consortium](https://www.gencodegenes.org/)
+- _RefSeq_ (GTF) - genes defined by [NCBI Reference Sequence](https://www.ncbi.nlm.nih.gov/refseq) (RefSeq) project
+- _Jannovar_ - [Jannovar](https://github.com/charite/jannovar) is a Java tool for functional annotation of genomic variants identified in NGS experiments, and it uses transcripts defined by _RefSeq_, _ENSEMBL_, and _UCSC_.
+
+### Convert Gencode genes into _Silent genes_ format
+
+Use `parse-gencode` to convert Gencode genes:
+
+```bash
+wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.basic.annotation.gtf.gz
+java -jar silent-genes-cli.jar parse-gencode gencode.v39.basic.annotation.gtf.gz gencode.sg.json.gz
+```
+
+### Convert Refseq genes into _Silent genes_ format
+
+Use `parse-refseq` to perform the conversion:
+
+```bash
+wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Homo_sapiens/annotation_releases/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.gtf.gz
+java -jar silent-genes-cli.jar parse-refseq GCF_000001405.39_GRCh38.p13_genomic.gtf.gz refseq.sg.json.gz
+```
+
+## Code examples
+
+The next paragraphs show how to use _Silent genes_ as a library in other Java application.
 
 ### Parse Gencode GTF file into a list of genes
 
