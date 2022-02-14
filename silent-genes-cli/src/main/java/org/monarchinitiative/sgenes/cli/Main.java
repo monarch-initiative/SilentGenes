@@ -1,5 +1,7 @@
 package org.monarchinitiative.sgenes.cli;
 
+import org.monarchinitiative.sgenes.cli.cmd.ParseGencodeCommand;
+import org.monarchinitiative.sgenes.cli.cmd.ParseRefseqCommand;
 import picocli.CommandLine;
 
 import java.util.Locale;
@@ -34,7 +36,8 @@ public class Main implements Callable<Integer> {
         Locale.setDefault(Locale.US);
         commandLine = new CommandLine(new Main())
                 .setColorScheme(COLOR_SCHEME)
-                .addSubcommand("parse-gencode", new ParseGencodeCommand());
+                .addSubcommand("parse-gencode", new ParseGencodeCommand())
+                .addSubcommand("parse-refseq", new ParseRefseqCommand());
         commandLine.setToggleBooleanFlags(false);
         System.exit(commandLine.execute(args));
 

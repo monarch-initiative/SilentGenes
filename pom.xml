@@ -8,7 +8,7 @@
         <module>silent-genes-model</module>
         <module>silent-genes-simple</module>
         <module>silent-genes-io</module>
-        <module>silent-genes-gencode</module>
+        <module>silent-genes-gtf</module>
         <module>silent-genes-jannovar</module>
         <module>silent-genes-cli</module>
     </modules>
