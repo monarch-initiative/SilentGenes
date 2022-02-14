@@ -10,6 +10,9 @@ import java.nio.file.Path;
 
 public class GtfGeneParserFactory {
 
+    private GtfGeneParserFactory() {
+    }
+
     public static GtfGeneParser<GencodeGene> gtfGeneParser(Path gencodeGtfPath, GenomicAssembly genomicAssembly) {
         return new GencodeParser(gencodeGtfPath, genomicAssembly);
     }
