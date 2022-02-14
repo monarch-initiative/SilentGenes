@@ -42,7 +42,7 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_361_055, 133_361_158)
         );
 
-        return Transcript.coding(txId, location, exons, location.coordinates());
+        return Transcript.of(txId, location, exons, location.coordinates());
     }
 
     // ------------------------------------------------- FBN1 ----------------------------------------------------------
@@ -74,7 +74,7 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_757, 133_351_982).invert(contig)
                 );
         Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_356_453).invert(contig);
-        return Transcript.coding(txId, location, exons, cdsCoordinates);
+        return Transcript.of(txId, location, exons, cdsCoordinates);
     }
 
     public static Transcript surf1_205(Contig contig) {
@@ -93,7 +93,7 @@ public class Genes {
 
         Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_353_936).invert(contig);
 
-        return Transcript.coding(txId, location, exons, cdsCoordinates);
+        return Transcript.of(txId, location, exons, cdsCoordinates);
     }
 
 }

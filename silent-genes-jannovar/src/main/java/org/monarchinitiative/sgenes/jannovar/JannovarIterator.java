@@ -95,7 +95,7 @@ public class JannovarIterator implements Iterator<Gene> {
         return Collections.unmodifiableList(txs);
     }
 
-    private static CodingTranscript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
+    private static Transcript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
         GenomeInterval txRegion = tx.getTXRegion();
         GenomicRegion location = GenomicRegion.of(contig, strand, COORDINATE_SYSTEM, txRegion.getBeginPos(), txRegion.getEndPos());
         List<Coordinates> exons = remapExons(tx.getExonRegions());
@@ -105,7 +105,7 @@ public class JannovarIterator implements Iterator<Gene> {
 //        Coordinates fivePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, txRegion.getBeginPos(), cds.getBeginPos() - 1);
 //        Coordinates threePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() + 2, txRegion.getEndPos());
 
-        return Transcript.coding(txId, location, exons, cdsCoordinates);
+        return Transcript.of(txId, location, exons, cdsCoordinates);
     }
 
     private static Transcript parseNoncodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
@@ -114,7 +114,7 @@ public class JannovarIterator implements Iterator<Gene> {
         GenomicRegion location = GenomicRegion.of(contig, strand, COORDINATE_SYSTEM, txRegion.getBeginPos(), txRegion.getEndPos());
         List<Coordinates> exons = remapExons(tx.getExonRegions());
 
-        return Transcript.noncoding(txId, location, exons);
+        return Transcript.of(txId, location, exons, null);
     }
 
     private static List<Coordinates> remapExons(List<GenomeInterval> exonRegions) {

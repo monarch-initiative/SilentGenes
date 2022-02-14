@@ -57,7 +57,7 @@ public class CodingTranscriptTest {
                     Coordinates.of(CoordinateSystem.zeroBased(), 7668402, 7669690).invert(contig)
             );
             Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 7669608, 7675215).invert(contig);
-            return Transcript.coding(txId, location, exons, cdsCoordinates);
+            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
         }
 
     }
@@ -100,7 +100,7 @@ public class CodingTranscriptTest {
                     Coordinates.of(CoordinateSystem.zeroBased(), 300, 500)
             );
             Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 177, 270);
-            return Transcript.coding(txId, location, exons, cdsCoordinates);
+            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
         }
     }
 
