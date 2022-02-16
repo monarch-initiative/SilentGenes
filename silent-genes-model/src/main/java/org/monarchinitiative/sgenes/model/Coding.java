@@ -10,6 +10,8 @@ import java.util.List;
  * <p>
  * Note, the implementations must ensure that the start codon is located upstream of the stop codon (at lower coordinates),
  * and that the codons span 3 bases.
+ *
+ * @see CodingTranscript
  */
 public interface Coding {
 

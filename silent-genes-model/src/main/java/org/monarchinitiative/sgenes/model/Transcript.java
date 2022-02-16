@@ -17,12 +17,41 @@ import java.util.List;
  */
 public interface Transcript extends Located, Identified<TranscriptIdentifier> {
 
+    /**
+     * Create a new {@link Transcript} instance.
+     *
+     * @param id transcript ID
+     * @param location transcript location
+     * @param exons exon coordinates
+     * @param cdsCoordinates coordinates of the coding region, or <code>null</code> for non-coding transcript.
+     *                       The expected <code>cdsCoordinates</code> spans the coordinates
+     *                       delimited by start and stop codons (included), including intronic sequences.
+     * @return transcript instance
+     */
+    static Transcript of(TranscriptIdentifier id,
+                         GenomicRegion location,
+                         List<Coordinates> exons,
+                         Coordinates cdsCoordinates) {
+        if (cdsCoordinates == null)
+            return TranscriptDefault.of(id, location, exons);
+        else
+            return CodingTranscriptDefault.of(id, location, exons, cdsCoordinates);
+    }
+
+    /**
+     * Use {@link #of(TranscriptIdentifier, GenomicRegion, List, Coordinates)} and pass null for <code>cdsCoordinates</code>
+     */
+    @Deprecated
     static Transcript noncoding(TranscriptIdentifier id,
                                 GenomicRegion location,
                                 List<Coordinates> exons) {
         return TranscriptDefault.of(id, location, exons);
     }
 
+    /**
+     * Use {@link #of(TranscriptIdentifier, GenomicRegion, List, Coordinates)}
+     */
+    @Deprecated
     static CodingTranscript coding(TranscriptIdentifier id,
                              GenomicRegion location,
                              List<Coordinates> exons,

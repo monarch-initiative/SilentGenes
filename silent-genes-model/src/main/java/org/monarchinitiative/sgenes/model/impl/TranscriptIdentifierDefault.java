@@ -36,7 +36,9 @@ public class TranscriptIdentifierDefault extends IdentifierDefault implements Tr
     @Override
     public String toString() {
         return "TranscriptIdentifierDefault{" +
-                "ccdsId='" + ccdsId + '\'' +
-                "} " + super.toString();
+                "accession='" + accession() + '\'' +
+                ", symbol='" + symbol() + '\'' +
+                ", ccdsId='" + ccdsId + '\'' +
+                "}";
     }
 }
