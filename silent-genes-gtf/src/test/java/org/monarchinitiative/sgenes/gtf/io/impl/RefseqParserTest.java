@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.sgenes.gtf.model.Biotype;
 import org.monarchinitiative.sgenes.gtf.model.RefseqGene;
+import org.monarchinitiative.sgenes.gtf.model.RefseqSource;
 import org.monarchinitiative.sgenes.gtf.model.RefseqTranscript;
 import org.monarchinitiative.sgenes.model.Coding;
 import org.monarchinitiative.sgenes.model.CodingTranscript;
@@ -183,7 +184,8 @@ public class RefseqParserTest {
             assertThat(first.id().ccdsId().isPresent(), equalTo(false));
             assertThat(first.location(), equalTo(GenomicRegion.of(GRCH37.contigByName("9"), Strand.POSITIVE, CoordinateSystem.zeroBased(), 136_223_425, 136_228_034)));
             assertThat(first.exons().size(), equalTo(6));
-            assertThat(first.refseqMetadata().biotype(), equalTo(Biotype.protein_coding));
+            assertThat(first.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(first.source(), equalTo(RefseqSource.BestRefSeq));
 
             assertThat(first, instanceOf(CodingTranscript.class));
             CodingTranscript firstCoding = (CodingTranscript) first;
@@ -197,7 +199,8 @@ public class RefseqParserTest {
             assertThat(second.id().ccdsId().isPresent(), equalTo(false));
             assertThat(second.location(), equalTo(GenomicRegion.of(GRCH37.contigByName("9"), Strand.POSITIVE, CoordinateSystem.zeroBased(), 136_223_425, 136_228_034)));
             assertThat(second.exons().size(), equalTo(6));
-            assertThat(second.refseqMetadata().biotype(), equalTo(Biotype.protein_coding));
+            assertThat(second.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(second.source(), equalTo(RefseqSource.BestRefSeq));
 
             assertThat(second, instanceOf(CodingTranscript.class));
             CodingTranscript secondCoding = (CodingTranscript) second;
