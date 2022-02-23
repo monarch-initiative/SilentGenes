@@ -1,6 +1,7 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.refseq;
 
 import org.monarchinitiative.sgenes.gtf.model.RefseqMetadata;
+import org.monarchinitiative.sgenes.gtf.model.RefseqSource;
 import org.monarchinitiative.sgenes.model.CodingTranscript;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 import org.monarchinitiative.svart.Coordinates;
@@ -9,24 +10,26 @@ import org.monarchinitiative.svart.GenomicRegion;
 import java.util.List;
 import java.util.Objects;
 
-public class RefseqCodingTranscriptImpl extends RefseqNoncodingTranscript implements CodingTranscript {
+public class RefseqCodingTranscript extends RefseqNoncodingTranscript implements CodingTranscript {
 
     private final Coordinates cdsCoordinates;
 
-    public static RefseqCodingTranscriptImpl of(TranscriptIdentifier id,
-                                                GenomicRegion location,
-                                                List<Coordinates> exons,
-                                                RefseqMetadata refseqMetadata,
-                                                Coordinates cdsCoordinates) {
-        return new RefseqCodingTranscriptImpl(id, location, exons, refseqMetadata, cdsCoordinates);
+    public static RefseqCodingTranscript of(TranscriptIdentifier id,
+                                            GenomicRegion location,
+                                            List<Coordinates> exons,
+                                            RefseqSource source,
+                                            RefseqMetadata refseqMetadata,
+                                            Coordinates cdsCoordinates) {
+        return new RefseqCodingTranscript(id, location, exons, refseqMetadata, source, cdsCoordinates);
     }
 
-    private RefseqCodingTranscriptImpl(TranscriptIdentifier id,
-                                         GenomicRegion location,
-                                         List<Coordinates> exons,
-                                         RefseqMetadata refseqMetadata,
-                                         Coordinates cdsCoordinates) {
-        super(id, location, exons, refseqMetadata);
+    private RefseqCodingTranscript(TranscriptIdentifier id,
+                                   GenomicRegion location,
+                                   List<Coordinates> exons,
+                                   RefseqMetadata refseqMetadata,
+                                   RefseqSource source,
+                                   Coordinates cdsCoordinates) {
+        super(id, location, exons, source, refseqMetadata);
         this.cdsCoordinates = Objects.requireNonNull(cdsCoordinates, "CDS coordinates must not be null");
     }
 
@@ -40,7 +43,7 @@ public class RefseqCodingTranscriptImpl extends RefseqNoncodingTranscript implem
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        RefseqCodingTranscriptImpl that = (RefseqCodingTranscriptImpl) o;
+        RefseqCodingTranscript that = (RefseqCodingTranscript) o;
         return Objects.equals(cdsCoordinates, that.cdsCoordinates);
     }
 
@@ -51,7 +54,7 @@ public class RefseqCodingTranscriptImpl extends RefseqNoncodingTranscript implem
 
     @Override
     public String toString() {
-        return "RefseqCodingTranscriptImpl{" +
+        return "RefseqCodingTranscript" +
                 "id=" + id() +
                 ", location=" + location() +
                 ", exons=" + exons() +

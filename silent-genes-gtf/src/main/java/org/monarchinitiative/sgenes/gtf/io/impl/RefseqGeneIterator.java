@@ -1,12 +1,12 @@
 package org.monarchinitiative.sgenes.gtf.io.impl;
 
 import org.monarchinitiative.sgenes.gtf.io.gtf.GtfRecord;
+import org.monarchinitiative.sgenes.gtf.io.gtf.GtfSource;
 import org.monarchinitiative.sgenes.gtf.model.*;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqGeneIdentifier;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqGeneImpl;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqMetadataImpl;
 import org.monarchinitiative.sgenes.model.GeneIdentifier;
-import org.monarchinitiative.sgenes.model.Transcript;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Transcript> {
+class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, RefseqTranscript> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RefseqGeneIterator.class);
     public static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTES = Set.of();
@@ -79,11 +79,11 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Tr
     }
 
     @Override
-    protected Optional<Transcript> processTranscript(String txId,
-                                                     GtfRecord tx,
-                                                     List<GtfRecord> exonRecords,
-                                                     GtfRecord startCodon,
-                                                     GtfRecord stopCodon) {
+    protected Optional<RefseqTranscript> processTranscript(String txId,
+                                                           GtfRecord tx,
+                                                           List<GtfRecord> exonRecords,
+                                                           GtfRecord startCodon,
+                                                           GtfRecord stopCodon) {
         Optional<String> txSymbol = getTxSymbol(tx);
 
         if (txSymbol.isEmpty()) {
@@ -103,13 +103,19 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Tr
         // CDS coordinates
         Optional<Coordinates> cdsCoordinates = createCdsCoordinates(startCodon, stopCodon, txId, tx);
 
+        Optional<RefseqSource> refseqSource = parseRefseqSource(tx.source());
+        if (refseqSource.isEmpty()) {
+            LOGGER.warn("Unknown RefSeq source {} for transcript {}", tx.source(), txId);
+            return Optional.empty();
+        }
+
         return Optional.of(
                 RefseqTranscript.of(txIdentifier,
                         tx.location(),
                         exons,
+                        refseqSource.get(),
                         metadata.get(),
-                        cdsCoordinates.orElse(null))
-        );
+                        cdsCoordinates.orElse(null)));
     }
 
     private static Optional<String> getTxSymbol(GtfRecord tx) {
@@ -129,10 +135,27 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Tr
                 .map(RefseqMetadataImpl::of);
     }
 
+    private static Optional<RefseqSource> parseRefseqSource(GtfSource source) {
+        switch (source) {
+            case GNOMON:
+                return Optional.of(RefseqSource.Gnomon);
+            case BEST_REF_SEQ:
+                return Optional.of(RefseqSource.BestRefSeq);
+            case REF_SEQ:
+                return Optional.of(RefseqSource.RefSeq);
+            case CURATED_GENOMIC:
+                return Optional.of(RefseqSource.CuratedGenomic);
+            case T_RNA_SCAN_SE:
+                return Optional.of(RefseqSource.tRNAScanSe);
+            default:
+                return Optional.empty();
+        }
+    }
+
     @Override
     protected RefseqGene newGeneInstance(GeneIdentifier geneIdentifier,
                                          GenomicRegion location,
-                                         List<Transcript> transcripts,
+                                         List<RefseqTranscript> transcripts,
                                          RefseqMetadata refseqMetadata) {
         return RefseqGeneImpl.of(geneIdentifier,
                 location,

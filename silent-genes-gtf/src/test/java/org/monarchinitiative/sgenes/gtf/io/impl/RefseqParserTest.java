@@ -1,24 +1,23 @@
 package org.monarchinitiative.sgenes.gtf.io.impl;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.monarchinitiative.sgenes.gtf.io.GtfGeneParser;
 import org.monarchinitiative.sgenes.gtf.model.Biotype;
 import org.monarchinitiative.sgenes.gtf.model.RefseqGene;
+import org.monarchinitiative.sgenes.gtf.model.RefseqSource;
+import org.monarchinitiative.sgenes.gtf.model.RefseqTranscript;
 import org.monarchinitiative.sgenes.model.Coding;
-import org.monarchinitiative.sgenes.model.Gene;
+import org.monarchinitiative.sgenes.model.CodingTranscript;
 import org.monarchinitiative.sgenes.model.Identified;
 import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
+import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.svart.Strand;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,27 +25,27 @@ import static org.hamcrest.Matchers.*;
 
 public class RefseqParserTest {
 
-    private static final GenomicAssembly GENOMIC_ASSEMBLY = GenomicAssemblies.GRCh38p13();
-
-    /**
-     * A GTF file with definitions of SURF2 and FBN1 genes from RefSeq.
-     * The file was prepared by running:
-     * <pre>
-     * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "^#" > GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
-     * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "SURF2" >> GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
-     * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "FBN1" >> GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
-     * gzip GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
-     * </pre>
-     * Then, we removed <em>FBN-DT</em> and the <em>SURF2_1</em>.
-     */
-    private static final Path SMALL_GTF_PATH = Path.of("src/test/resources/org/monarchinitiative/sgenes/gtf/io/impl/GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf.gz");
+    private static final Path IMPL_DIR = Path.of("src/test/resources/org/monarchinitiative/sgenes/gtf/io/impl");
 
     @Nested
     public class SmallGtfFileTest {
+        private final GenomicAssembly GRCH38 = GenomicAssemblies.GRCh38p13();
+        /**
+         * A GTF file with definitions of SURF2 and FBN1 genes from RefSeq.
+         * The file was prepared by running:
+         * <pre>
+         * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "^#" > GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "SURF2" >> GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "FBN1" >> GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * gzip GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * </pre>
+         * Then, we removed <em>FBN-DT</em> and the <em>SURF2_1</em>.
+         */
+        private final Path GTF_PATH = IMPL_DIR.resolve("GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf.gz");
 
         @Test
         public void iterate() {
-            RefseqParser parser = new RefseqParser(SMALL_GTF_PATH, GENOMIC_ASSEMBLY);
+            RefseqParser parser = new RefseqParser(GTF_PATH, GRCH38);
 
             List<RefseqGene> genes = new ArrayList<>();
             for (RefseqGene gene : parser) {
@@ -59,7 +58,7 @@ public class RefseqParserTest {
         @Test
         public void stream() {
 
-            RefseqParser parser = new RefseqParser(SMALL_GTF_PATH, GENOMIC_ASSEMBLY);
+            RefseqParser parser = new RefseqParser(GTF_PATH, GRCH38);
 
             List<RefseqGene> genes = parser.stream().sequential()
                     .collect(Collectors.toUnmodifiableList());
@@ -118,6 +117,95 @@ public class RefseqParserTest {
                     .collect(Collectors.toMap(Identified::accession, Coding::cdsCoordinates));
             assertThat(cdsCoordinates, hasEntry("NM_000138.5", Coordinates.of(CoordinateSystem.oneBased(), 53_346_421, 53_580_200)));
 
+        }
+    }
+
+    /**
+     * Older (hg19) RefSeq releases do not include `transcript` rows. We should infer the transcript data from other rows.
+     */
+    @Nested
+    public class MissingTranscriptRecordsTest {
+
+        private final GenomicAssembly GRCH37 = GenomicAssemblies.GRCh37p13();
+        /**
+         * A GTF file with definitions of SURF2 and FBN1 genes from RefSeq.
+         * The file was prepared by running:
+         * <pre>
+         * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "^#" > GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "SURF2" >> GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * zcat GCF_000001405.39_GRCh38.p13_genomic.gtf.gz | grep "FBN1" >> GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * gzip GCF_000001405.39_GRCh38.p13_genomic.surf2_fbn1.gtf
+         * </pre>
+         * Then, we removed <em>FBN-DT</em> and the <em>SURF2_1</em>.
+         */
+        private final Path GTF_PATH = IMPL_DIR.resolve("GCF_000001405.25_GRCh37.p13_genomic.surf2.gtf.gz");
+
+        @Test
+        public void iterate() {
+            RefseqParser parser = new RefseqParser(GTF_PATH, GRCH37);
+
+            List<RefseqGene> genes = new ArrayList<>();
+            for (RefseqGene gene : parser) {
+                genes.add(gene);
+            }
+            assertThat(genes, hasSize(1));
+
+
+            RefseqGene surf2 = genes.get(0);
+
+            // Location stuff
+            assertThat(surf2.contigName(), equalTo("9"));
+            assertThat(surf2.strand(), equalTo(Strand.POSITIVE));
+            assertThat(surf2.coordinateSystem(), equalTo(CoordinateSystem.oneBased()));
+            assertThat(surf2.start(), equalTo(136_223_426));
+            assertThat(surf2.end(), equalTo(136_228_034));
+
+            // ID stuff
+            assertThat(surf2.accession(), equalTo("NCBIGene:6835"));
+            assertThat(surf2.symbol(), equalTo("SURF2"));
+            assertThat(surf2.id().hgncId().isPresent(), equalTo(true));
+            assertThat(surf2.id().hgncId().get(), equalTo("HGNC:11475"));
+            assertThat(surf2.id().ncbiGeneId().isPresent(), equalTo(true));
+            assertThat(surf2.id().ncbiGeneId().get(), equalTo("NCBIGene:6835"));
+
+            // Metadata
+            assertThat(surf2.refseqMetadata().biotype(), equalTo(Biotype.protein_coding));
+
+            // Transcripts
+            assertThat(surf2.transcriptCount(), equalTo(2));
+            List<? extends RefseqTranscript> txs = surf2.transcriptStream()
+                    .sorted(Comparator.comparing(Identified::accession))
+                    .collect(Collectors.toList());
+
+            // - NM_001278928.2
+            RefseqTranscript first = txs.get(0);
+            assertThat(first.accession(), equalTo("NM_001278928.2"));
+            assertThat(first.symbol(), equalTo("surfeit 2, transcript variant 2"));
+            assertThat(first.id().ccdsId().isPresent(), equalTo(false));
+            assertThat(first.location(), equalTo(GenomicRegion.of(GRCH37.contigByName("9"), Strand.POSITIVE, CoordinateSystem.zeroBased(), 136_223_425, 136_228_034)));
+            assertThat(first.exons().size(), equalTo(6));
+            assertThat(first.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(first.source(), equalTo(RefseqSource.BestRefSeq));
+
+            assertThat(first, instanceOf(CodingTranscript.class));
+            CodingTranscript firstCoding = (CodingTranscript) first;
+            assertThat(firstCoding.startCodon().startWithCoordinateSystem(CoordinateSystem.zeroBased()), equalTo(136_223_468));
+            assertThat(firstCoding.stopCodon().endWithCoordinateSystem(CoordinateSystem.zeroBased()), equalTo(136_228_015));
+
+            // - NM_017503.5
+            RefseqTranscript second = txs.get(1);
+            assertThat(second.accession(), equalTo("NM_017503.5"));
+            assertThat(second.symbol(), equalTo("surfeit 2, transcript variant 1"));
+            assertThat(second.id().ccdsId().isPresent(), equalTo(false));
+            assertThat(second.location(), equalTo(GenomicRegion.of(GRCH37.contigByName("9"), Strand.POSITIVE, CoordinateSystem.zeroBased(), 136_223_425, 136_228_034)));
+            assertThat(second.exons().size(), equalTo(6));
+            assertThat(second.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(second.source(), equalTo(RefseqSource.BestRefSeq));
+
+            assertThat(second, instanceOf(CodingTranscript.class));
+            CodingTranscript secondCoding = (CodingTranscript) second;
+            assertThat(secondCoding.startCodon().startWithCoordinateSystem(CoordinateSystem.zeroBased()), equalTo(136_223_468));
+            assertThat(secondCoding.stopCodon().endWithCoordinateSystem(CoordinateSystem.zeroBased()), equalTo(136_228_015));
         }
     }
 
