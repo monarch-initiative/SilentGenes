@@ -13,7 +13,7 @@ public class GtfRecordParser {
 
     static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.oneBased(); // GTF invariant
     private static final Logger LOGGER = LoggerFactory.getLogger(GtfRecordParser.class);
-    private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("\\s*(?<key>[\\w_]+)\\s*\"?(?<value>[\\w\\d\\s_:./()\\-,]*)\"?\\s*");
+    private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("\\s*(?<key>[\\w_]+)\\s*\"?(?<value>[\\w\\d\\s_:./()\\-+,'@*]*)\"?\\s*");
     private static final Pattern TAG_PATTERN = Pattern.compile("tag\\s*\"(?<value>[\\w\\d_:./\\-]+)\"");
     // max number of fields in the GTF file used to develop this parser. A good default capacity for the attribute map
     private static final int N_ATTRIBUTE_FIELDS = 26;
@@ -114,11 +114,15 @@ public class GtfRecordParser {
             case "BestRefSeq":
             case "BestRefSeq%2CGnomon":
                 /*
-                 `%2C` stands for `,` in ASCII, so I assume the source is both BestRefSeq and Gnomon.
-                 I use BestRefSeq as I consider it as a higher level of evidence.
+                 `%2C` stands for `,` in ASCII, so I assume the source is both `BestRefSeq` and `Gnomon`.
+                 I use `BestRefSeq` as I consider it as a higher level of evidence.
                 */
                 return GtfSource.BEST_REF_SEQ;
             case "Curated Genomic":
+            case "Curated Genomic%2CtRNAscan-SE":
+                /*
+                I assume `Curated Genomic` is better than `tRNAscan-SE`.
+                 */
                 return GtfSource.CURATED_GENOMIC;
             case "Gnomon":
                 return GtfSource.GNOMON;

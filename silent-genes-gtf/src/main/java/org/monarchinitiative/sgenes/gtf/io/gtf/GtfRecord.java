@@ -14,12 +14,12 @@ public class GtfRecord implements Located {
     private final Map<String, List<String>> attributes;
     private final Set<String> tags;
 
-    static GtfRecord of(GenomicRegion location,
-                        GtfSource source,
-                        GtfFeature feature,
-                        GtfFrame frame,
-                        Map<String, List<String>> attributes,
-                        Set<String> tags) {
+    public static GtfRecord of(GenomicRegion location,
+                               GtfSource source,
+                               GtfFeature feature,
+                               GtfFrame frame,
+                               Map<String, List<String>> attributes,
+                               Set<String> tags) {
         Objects.requireNonNull(location, "Location must not be null");
         Objects.requireNonNull(source, "GtfSource must not be null");
         Objects.requireNonNull(feature, "GtfFeature must not be null");

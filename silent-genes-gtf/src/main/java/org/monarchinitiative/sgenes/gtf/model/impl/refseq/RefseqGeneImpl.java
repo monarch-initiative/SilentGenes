@@ -2,8 +2,8 @@ package org.monarchinitiative.sgenes.gtf.model.impl.refseq;
 
 import org.monarchinitiative.sgenes.gtf.model.RefseqGene;
 import org.monarchinitiative.sgenes.gtf.model.RefseqMetadata;
+import org.monarchinitiative.sgenes.gtf.model.RefseqTranscript;
 import org.monarchinitiative.sgenes.model.GeneIdentifier;
-import org.monarchinitiative.sgenes.model.Transcript;
 import org.monarchinitiative.sgenes.model.base.BaseGene;
 import org.monarchinitiative.svart.GenomicRegion;
 
@@ -13,19 +13,19 @@ import java.util.Objects;
 
 public class RefseqGeneImpl extends BaseGene implements RefseqGene {
 
-    private final List<? extends Transcript> transcripts;
+    private final List<? extends RefseqTranscript> transcripts;
     private final RefseqMetadata refseqMetadata;
 
     public static RefseqGeneImpl of(GeneIdentifier identifier,
                                     GenomicRegion location,
-                                    List<? extends Transcript> transcripts,
+                                    List<? extends RefseqTranscript> transcripts,
                                     RefseqMetadata refseqMetadata) {
         return new RefseqGeneImpl(identifier, location, transcripts, refseqMetadata);
     }
 
     private RefseqGeneImpl(GeneIdentifier identifier,
                    GenomicRegion location,
-                   List<? extends Transcript> transcripts,
+                   List<? extends RefseqTranscript> transcripts,
                    RefseqMetadata refseqMetadata) {
         super(identifier, location);
         this.transcripts = Objects.requireNonNull(transcripts, "Transcripts must not be null");
@@ -35,7 +35,7 @@ public class RefseqGeneImpl extends BaseGene implements RefseqGene {
     }
 
     @Override
-    public Iterator<? extends Transcript> transcripts() {
+    public Iterator<? extends RefseqTranscript> transcripts() {
         return transcripts.iterator();
     }
 

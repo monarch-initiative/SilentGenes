@@ -6,7 +6,6 @@ import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqGeneIdentifier;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqGeneImpl;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqMetadataImpl;
 import org.monarchinitiative.sgenes.model.GeneIdentifier;
-import org.monarchinitiative.sgenes.model.Transcript;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
@@ -19,7 +18,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Transcript> {
+class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, RefseqTranscript> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RefseqGeneIterator.class);
     public static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTES = Set.of();
@@ -79,7 +78,7 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Tr
     }
 
     @Override
-    protected Optional<Transcript> processTranscript(String txId,
+    protected Optional<RefseqTranscript> processTranscript(String txId,
                                                      GtfRecord tx,
                                                      List<GtfRecord> exonRecords,
                                                      GtfRecord startCodon,
@@ -132,7 +131,7 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Tr
     @Override
     protected RefseqGene newGeneInstance(GeneIdentifier geneIdentifier,
                                          GenomicRegion location,
-                                         List<Transcript> transcripts,
+                                         List<RefseqTranscript> transcripts,
                                          RefseqMetadata refseqMetadata) {
         return RefseqGeneImpl.of(geneIdentifier,
                 location,

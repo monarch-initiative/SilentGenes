@@ -36,8 +36,8 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseGeneIterator.class);
     // Each transcript/exon must have these attributes, no matter what. Otherwise, we cannot partition Gtf lines.
-    private static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES = Set.of("transcript_id");
-    private static final Set<String> MANDATORY_EXON_ATTRIBUTE_NAMES = Set.of("transcript_id");
+    private static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTE_NAMES = Set.of("gene_id", "transcript_id");
+    private static final Set<String> MANDATORY_EXON_ATTRIBUTE_NAMES = Set.of("gene_id", "transcript_id");
     // GTF line has exon number attribute stored under this key
     private static final String EXON_NUMBER_ATTRIBUTE_KEY = "exon_number";
 
@@ -252,6 +252,15 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
             }
         }
 
+        if (gene == null) {
+            LOGGER.warn("Missing gene record for gene {}", geneId);
+            return Optional.empty();
+        }
+
+        if (transcripts.isEmpty())
+            // older RefSeq releases for hg19 do not have `transcript` records
+            transcripts.addAll(InferTranscriptRecord.inferTranscriptRecords(gene, exons));
+
         return Optional.of(new GtfGeneData(gene, transcripts, exons, startCodons, stopCodons));
     }
 
@@ -317,12 +326,14 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
         return Arrays.asList(exons);
     }
 
-    protected static Optional<Biotype> parseBiotype(String geneType) {
-        switch (geneType.toLowerCase()) {
+    protected static Optional<Biotype> parseBiotype(String biotype) {
+        switch (biotype.toLowerCase()) {
             case "protein_coding":
                 return Optional.of(Biotype.protein_coding);
 
             // --- ncRNA ---
+            case "ncrna":
+                return Optional.of(Biotype.ncRNA);
             case "mirna":
                 return Optional.of(Biotype.miRNA);
             case "rrna":
