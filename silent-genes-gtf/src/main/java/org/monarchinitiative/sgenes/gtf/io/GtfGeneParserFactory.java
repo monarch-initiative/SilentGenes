@@ -13,7 +13,16 @@ public class GtfGeneParserFactory {
     private GtfGeneParserFactory() {
     }
 
+    // TODO(v0.3) - remove
+    /**
+     * The method will be removed in <em>v0.3</em>, use {@link #gencodeGeneParser(Path, GenomicAssembly)} instead.
+     */
+    @Deprecated(since = "0.2.1")
     public static GtfGeneParser<GencodeGene> gtfGeneParser(Path gencodeGtfPath, GenomicAssembly genomicAssembly) {
+        return gencodeGeneParser(gencodeGtfPath, genomicAssembly);
+    }
+
+    public static GtfGeneParser<GencodeGene> gencodeGeneParser(Path gencodeGtfPath, GenomicAssembly genomicAssembly) {
         return new GencodeParser(gencodeGtfPath, genomicAssembly);
     }
 

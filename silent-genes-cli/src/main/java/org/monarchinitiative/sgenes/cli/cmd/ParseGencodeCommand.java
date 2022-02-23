@@ -27,7 +27,7 @@ public class ParseGencodeCommand extends BaseParseCommand {
     @Override
     protected List<? extends Gene> readGenes(GenomicAssembly assembly) {
         LOGGER.info("Reading GENCODE genes from `{}`", gtfPath.toAbsolutePath());
-        GtfGeneParser<GencodeGene> parser = GtfGeneParserFactory.gtfGeneParser(gtfPath, assembly);
+        GtfGeneParser<GencodeGene> parser = GtfGeneParserFactory.gencodeGeneParser(gtfPath, assembly);
         return parser.stream()
                 .collect(Collectors.toUnmodifiableList());
     }
