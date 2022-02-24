@@ -19,9 +19,7 @@ public abstract class BaseTranscript implements Transcript {
                              List<Coordinates> exons) {
         this.id = Objects.requireNonNull(id, "ID must not be null");
         this.location = Objects.requireNonNull(location, "Location must not be null");
-        this.exons = Objects.requireNonNull(exons, "Exons must not be null");
-        if (exons.isEmpty())
-            throw new IllegalArgumentException("Exon list must not be empty");
+        this.exons = exons; // non-nullity checked in Transcript.of()
     }
 
     @Override
