@@ -26,6 +26,7 @@ public class GeneParserTest extends GeneParserTestBase {
 
     private static Path prepareCompressedJson() throws IOException {
         Path dest = Files.createTempFile("sg", ".json.gz");
+        dest.toFile().deleteOnExit();
         try (OutputStream os = new BufferedOutputStream(new GZIPOutputStream(Files.newOutputStream(dest)))) {
             ((GeneParser) GENE_PARSER).write(GENES, os);
         }
