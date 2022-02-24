@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.svart.*;
-import org.monarchinitiative.svart.assembly.GenomicAssemblies;
-import org.monarchinitiative.svart.assembly.GenomicAssembly;
 
 import java.util.List;
 
@@ -14,50 +12,27 @@ import static org.hamcrest.Matchers.*;
 
 public class CodingTranscriptTest {
 
-    private static final GenomicAssembly ASSEMBLY = GenomicAssemblies.GRCh38p13();
-
     @Nested
     public static class Simple {
-
         private CodingTranscript transcript;
-        private final Contig contig = ASSEMBLY.contigByName("chr17");
 
         @BeforeEach
-        public void setUp(){
-
-            transcript = this.getTranscript(contig);
+        public void setUp() {
+            transcript = TestInstances.RealWorld.tp53();
         }
 
         @Test
         public void fivePrimeRegion() {
             List<Coordinates> fivePrimeRegion = transcript.fivePrimeRegion();
             assertThat(fivePrimeRegion, hasSize(1));
-            assertThat(fivePrimeRegion, hasItem(Coordinates.of(CoordinateSystem.zeroBased(), 7668402, 7675493).invert(contig)));
+            assertThat(fivePrimeRegion, hasItem(Coordinates.of(CoordinateSystem.zeroBased(), 7675215, 7675493).invert(transcript.contig())));
         }
 
         @Test
         public void threePrimeRegion() {
             List<Coordinates> threePrimeRegion = transcript.threePrimeRegion();
             assertThat(threePrimeRegion, hasSize(1));
-            assertThat(threePrimeRegion, hasItem(Coordinates.of(CoordinateSystem.zeroBased(),7668402,7669608).invert(contig)));
-        }
-
-        private CodingTranscript getTranscript(Contig contig){
-            TranscriptIdentifier txId = TranscriptIdentifier.of("ENST00000504937.5", "TP53",
-                    "CCDS73967.1");
-            GenomicRegion location = GenomicRegion.of(contig, Strand.POSITIVE, CoordinateSystem.zeroBased(),
-                    7668402, 7675493).toNegativeStrand();
-            List<Coordinates> exons = List.of(
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7675052, 7675493).invert(contig),
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7674858, 7674971).invert(contig),
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7674180, 7674290).invert(contig),
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7673700, 7673837).invert(contig),
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7673534, 7673608).invert(contig),
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7670608, 7670715).invert(contig),
-                    Coordinates.of(CoordinateSystem.zeroBased(), 7668402, 7669690).invert(contig)
-            );
-            Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 7669608, 7675215).invert(contig);
-            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
+            assertThat(threePrimeRegion, hasItem(Coordinates.of(CoordinateSystem.zeroBased(),7668402,7669608).invert(transcript.contig())));
         }
 
     }
@@ -65,7 +40,7 @@ public class CodingTranscriptTest {
     @Nested
     public static class Complex {
         private CodingTranscript transcript;
-        private final Contig contig = ASSEMBLY.contigByName("chr17");
+        private final Contig contig = TestInstances.RealWorld.GRCH38.contigByName("chr17");
 
         @BeforeEach
         public void setUp() {
@@ -103,7 +78,6 @@ public class CodingTranscriptTest {
             return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
         }
     }
-
 
 
 }
