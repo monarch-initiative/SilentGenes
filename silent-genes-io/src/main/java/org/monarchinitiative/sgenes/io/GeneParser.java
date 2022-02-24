@@ -33,9 +33,18 @@ public interface GeneParser {
         }
     }
 
-    void write(List<? extends Gene> genes, OutputStream outputStream) throws IOException;
+    void write(Iterable<? extends Gene> genes, OutputStream outputStream) throws IOException;
 
-    default void write(List<? extends Gene> genes, Path destination) throws IOException {
+    /**
+     * Persist a list of {@link Gene} into destination path.
+     * <p>
+     * The file will be compressed on-the-fly if the file name ends with <code>.gz</code>.
+     *
+     * @param genes       to store
+     * @param destination where to persist the genes
+     * @throws IOException if something truly terrible happens
+     */
+    default void write(Iterable<? extends Gene> genes, Path destination) throws IOException {
         try (OutputStream outputStream = openForWriting(destination)) {
             write(genes, outputStream);
         }
@@ -43,6 +52,15 @@ public interface GeneParser {
 
     List<? extends Gene> read(InputStream inputStream) throws IOException;
 
+    /**
+     * Read {@link Gene}s from given <code>source</code>.
+     * <p>
+     * The file will be uncompressed on-the-fly if the file name ends with <code>.gz</code>.
+     *
+     * @param source path to the source file
+     * @return list of genes
+     * @throws IOException if something truly terrible happens
+     */
     default List<? extends Gene> read(Path source) throws IOException {
         try (InputStream inputStream = openForReading(source)) {
             return read(inputStream);
