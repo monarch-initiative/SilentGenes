@@ -2,6 +2,7 @@ package org.monarchinitiative.sgenes.io.json;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.monarchinitiative.sgenes.io.GeneParserTestBase;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.sgenes.model.Gene;
@@ -9,30 +10,23 @@ import org.monarchinitiative.sgenes.simple.Genes;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class JsonGeneParserTest {
-
-    private static final GenomicAssembly ASSEMBLY = GenomicAssemblies.GRCh38p13();
+public class JsonGeneParserTest extends GeneParserTestBase {
 
     @Test
     public void deserialize() throws Exception {
         JsonGeneParser parser = JsonGeneParser.of(ASSEMBLY);
 
-        List<Gene> actual = new ArrayList<>();
-        try (InputStream is = JsonGeneParserTest.class.getResourceAsStream("test-surf1_surf2.json")) {
-            actual.addAll(parser.read(is));
+        List<? extends Gene> actual = parser.read(JSON_TEST);
 
-        }
         List<Gene> expected = List.of(Genes.surf1(), Genes.surf2());
 
         assertThat(actual, equalTo(expected));
