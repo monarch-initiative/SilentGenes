@@ -28,7 +28,7 @@ public class GeneParserTest extends GeneParserTestBase {
         Path dest = Files.createTempFile("sg", ".json.gz");
         dest.toFile().deleteOnExit();
         try (OutputStream os = new BufferedOutputStream(new GZIPOutputStream(Files.newOutputStream(dest)))) {
-            ((GeneParser) GENE_PARSER).write(GENES, os);
+            GENE_PARSER.write(GENES, os);
         }
         return dest;
     }

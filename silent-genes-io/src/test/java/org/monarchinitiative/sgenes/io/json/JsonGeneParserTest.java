@@ -47,7 +47,7 @@ public class JsonGeneParserTest extends GeneParserTestBase {
 
     @Test
     @Disabled
-    // Used to generate the paylod to compare with in deserialize test.
+    // Used to generate the payload to compare with in deserialize test.
     public void dump() throws Exception {
         List<Gene> genes = List.of(Genes.surf1(), Genes.surf2());
         JsonGeneParser parser = JsonGeneParser.of(ASSEMBLY);
