@@ -1,5 +1,7 @@
 package org.monarchinitiative.sgenes.cli;
 
+import org.monarchinitiative.sgenes.cli.cmd.ExportGencodeCommand;
+import org.monarchinitiative.sgenes.cli.cmd.ExportRefseqCommand;
 import org.monarchinitiative.sgenes.cli.cmd.ParseGencodeCommand;
 import org.monarchinitiative.sgenes.cli.cmd.ParseRefseqCommand;
 import picocli.CommandLine;
@@ -37,14 +39,16 @@ public class Main implements Callable<Integer> {
         commandLine = new CommandLine(new Main())
                 .setColorScheme(COLOR_SCHEME)
                 .addSubcommand("parse-gencode", new ParseGencodeCommand())
-                .addSubcommand("parse-refseq", new ParseRefseqCommand());
+                .addSubcommand("parse-refseq", new ParseRefseqCommand())
+                .addSubcommand("export-gencode-metadata", new ExportGencodeCommand())
+                .addSubcommand("export-refseq-metadata", new ExportRefseqCommand());
         commandLine.setToggleBooleanFlags(false);
         System.exit(commandLine.execute(args));
 
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         // work done in subcommands
         commandLine.usage(commandLine.getOut());
         return 0;

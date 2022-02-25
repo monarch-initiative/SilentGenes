@@ -1,8 +1,12 @@
 package org.monarchinitiative.sgenes.gtf.model;
 
 /**
- * Gene/Transcript biotypes as described in <a href="https://www.gencodegenes.org/pages/biotypes.html">GENCODE documentation</a>
- * and <a href="https://vega.archive.ensembl.org/info/about/gene_and_transcript_types.html">Vega gene and transcript types</a>.
+ * Gene/Transcript biotypes as described in:
+ * <ul>
+ *     <li><a href="https://www.gencodegenes.org/pages/biotypes.html">GENCODE documentation</a></li>
+ *     <li><a href="https://vega.archive.ensembl.org/info/about/gene_and_transcript_types.html">Vega gene and transcript types</a>, and</li>
+ *     <li><a href="https://ftp.ncbi.nlm.nih.gov/genomes/README_GFF3.txt">RefSeq docs</a></li>
+ * </ul>
  */
 public enum Biotype {
 
@@ -21,11 +25,17 @@ public enum Biotype {
 
     MT,
 
+    transcript,
+
+    ribozyme,
+    primary_transcript(transcript),
+
     /**
      * Does not contain an ORF.
      */
-    processed_transcript,
+    processed_transcript(transcript),
 
+    mRNA,
 
     // ------------------------------------------------- ncRNA ---------------------------------------------------------
     /**
@@ -72,6 +82,14 @@ public enum Biotype {
      * Short non coding RNA gene that forms part of the vault ribonucleoprotein complex.
      */
     vaultRNA(ncRNA),
+    /**
+     * Antisense RNA.
+     */
+    asRNA(ncRNA),
+    /**
+     * Y RNAs are small non-coding RNAs, components of the Ro60 ribonucleoprotein particle.
+     */
+    yRNA(ncRNA),
     /**
      * Miscellaneous RNA.
      */
@@ -137,6 +155,10 @@ public enum Biotype {
      */
     macro_lncRNA(lncRNA),
     /**
+     * Telomerase RNA.
+     */
+    trRNA(lncRNA),
+    /**
      * A non-coding locus that originates from within the promoter region of a protein-coding gene,
      * with transcription proceeding in the opposite direction on the other strand.
      */
@@ -168,6 +190,7 @@ public enum Biotype {
      * Pseudogene that can contain introns since produced by gene duplication.
      */
     unprocessed_pseudogene(pseudogene),
+    transcribed_pseudogene(pseudogene),
     /**
      * Pseudogene where protein homology or genomic structure indicates a pseudogene, but the presence
      * of locus-specific transcripts indicates expression.
