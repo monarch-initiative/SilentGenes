@@ -51,7 +51,10 @@ public class GencodeNoncodingTranscript extends BaseTranscript implements Gencod
     @Override
     public String toString() {
         return "GencodeNoncodingTranscript{" +
-                "gencodeMetadata=" + gencodeMetadata +
-                "} " + super.toString();
+                "id=" + id() +
+                ", location=" + location() +
+                ", exons=" + exons() +
+                ", gencodeMetadata=" + gencodeMetadata +
+                "}";
     }
 }

@@ -53,7 +53,11 @@ public class GencodeCodingTranscript extends GencodeNoncodingTranscript implemen
     @Override
     public String toString() {
         return "GencodeCodingTranscript{" +
-                "cdsCoordinates=" + cdsCoordinates +
-                "} " + super.toString();
+                "id=" + id() +
+                ", location=" + location() +
+                ", exons=" + exons() +
+                ", cdsCoordinates=" + cdsCoordinates +
+                ", gencodeMetadata=" + gencodeMetadata() +
+                "}";
     }
 }

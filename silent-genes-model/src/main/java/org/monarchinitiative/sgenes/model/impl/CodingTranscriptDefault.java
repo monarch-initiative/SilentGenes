@@ -24,6 +24,11 @@ public class CodingTranscriptDefault extends BaseCodingTranscript {
     }
     @Override
     public String toString() {
-        return "CodingTranscriptDefault{} " + super.toString();
+        return "CodingTranscriptDefault{" +
+                "id=" + id() +
+                ", location=" + location() +
+                ", exons=" + exons() +
+                ", cdsCoordinates=" + cdsCoordinates() +
+                '}';
     }
 }

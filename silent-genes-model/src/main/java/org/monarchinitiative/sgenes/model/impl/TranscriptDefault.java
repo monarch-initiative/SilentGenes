@@ -21,6 +21,10 @@ public class TranscriptDefault extends BaseTranscript {
 
     @Override
     public String toString() {
-        return "TranscriptDefault{} " + super.toString();
+        return "TranscriptDefault{" +
+                "id=" + id() +
+                ", location=" + location() +
+                ", exons=" + exons() +
+                '}';
     }
 }
