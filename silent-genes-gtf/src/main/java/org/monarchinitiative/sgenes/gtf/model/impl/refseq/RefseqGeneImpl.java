@@ -70,6 +70,6 @@ public class RefseqGeneImpl extends BaseGene implements RefseqGene {
                 ", location=" + location +
                 ", transcripts=" + transcripts +
                 ", refseqMetadata=" + refseqMetadata +
-                "} " + super.toString();
+                "}";
     }
 }

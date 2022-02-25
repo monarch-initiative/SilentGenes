@@ -42,7 +42,10 @@ public abstract class BaseCodingTranscript extends BaseTranscript implements Cod
     @Override
     public String toString() {
         return "BaseCodingTranscript{" +
-                "cdsCoordinates=" + cdsCoordinates +
-                "} " + super.toString();
+                "id=" + id() +
+                ", location=" + location() +
+                ", exons=" + exons() +
+                ", cdsCoordinates=" + cdsCoordinates() +
+                '}';
     }
 }

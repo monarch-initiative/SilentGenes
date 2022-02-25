@@ -1,17 +1,11 @@
 package org.monarchinitiative.sgenes.cli.cmd;
 
 import org.monarchinitiative.sgenes.cli.Main;
-import org.monarchinitiative.sgenes.gtf.io.GtfGeneParser;
-import org.monarchinitiative.sgenes.gtf.io.GtfGeneParserFactory;
 import org.monarchinitiative.sgenes.gtf.model.RefseqGene;
-import org.monarchinitiative.sgenes.model.Gene;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "parse-refseq",
         aliases = {"R"},
@@ -20,16 +14,11 @@ import java.util.stream.Collectors;
         version = Main.VERSION,
         usageHelpWidth = Main.WIDTH,
         footer = Main.FOOTER)
-public class ParseRefseqCommand extends BaseParseCommand {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParseRefseqCommand.class);
+public class ParseRefseqCommand extends BaseExportCommand {
 
     @Override
-    protected List<? extends Gene> readGenes(GenomicAssembly assembly) {
-        LOGGER.info("Reading RefSeq genes from `{}`", gtfPath.toAbsolutePath());
-        GtfGeneParser<RefseqGene> parser = GtfGeneParserFactory.refseqGtfParser(gtfPath, assembly);
-        return parser.stream()
-                .collect(Collectors.toUnmodifiableList());
+    protected List<? extends RefseqGene> readGenes(GenomicAssembly assembly) {
+        return IOUtils.readRefseqGenes(assembly, validateInput());
     }
 
 }

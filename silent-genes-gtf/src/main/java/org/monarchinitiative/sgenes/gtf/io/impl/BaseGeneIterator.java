@@ -329,8 +329,13 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
     protected static Optional<Biotype> parseBiotype(String biotype) {
         switch (biotype.toLowerCase()) {
             case "protein_coding":
+            case "rnase_mrp_rna":
+                // See https://hpo.jax.org/app/browse/gene/6023
                 return Optional.of(Biotype.protein_coding);
-
+            case "primary_transcript":
+                return Optional.of(Biotype.primary_transcript);
+            case "mrna":
+                return Optional.of(Biotype.mRNA);
             // --- ncRNA ---
             case "ncrna":
                 return Optional.of(Biotype.ncRNA);
@@ -340,14 +345,21 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
                 return Optional.of(Biotype.rRNA);
             case "srna":
                 return Optional.of(Biotype.sRNA);
+            case "trna":
+                return Optional.of(Biotype.tRNA);
             case "scrna":
                 return Optional.of(Biotype.scRNA);
             case "snrna":
                 return Optional.of(Biotype.snRNA);
+            case "asrna":
+            case "antisense_rna":
+                return Optional.of(Biotype.asRNA);
             case "scarna":
                 return Optional.of(Biotype.scaRNA);
             case "snorna":
                 return Optional.of(Biotype.snoRNA);
+            case "y_rna":
+                return Optional.of(Biotype.yRNA);
             case "vault_rna":
                 return Optional.of(Biotype.vaultRNA);
             case "misc_rna":
@@ -356,13 +368,19 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
 
             // --- long non-coding RNA
             case "lncrna":
+            case "lnc_rna":
                 return Optional.of(Biotype.lncRNA);
+            case "telomerase_rna":
+                return Optional.of(Biotype.trRNA);
 
             case "pseudogene":
+            case "ncrna_pseudogene":
                 return Optional.of(Biotype.pseudogene);
 
             case "processed_pseudogene":
                 return Optional.of(Biotype.processed_pseudogene);
+            case "transcribed_pseudogene":
+                return Optional.of(Biotype.transcribed_pseudogene);
             case "transcribed_processed_pseudogene":
                 return Optional.of(Biotype.transcribed_processed_pseudogene);
             case "translated_processed_pseudogene":
@@ -381,21 +399,32 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
                 return Optional.of(Biotype.polymorphic_pseudogene);
 
             case "ig_c_gene":
+            case "c_gene_segment":
+            case "c_region":
                 return Optional.of(Biotype.IG_C_gene);
             case "ig_j_gene":
+            case "j_segment":
+            case "j_gene_segment":
                 return Optional.of(Biotype.IG_J_gene);
             case "ig_v_gene":
+            case "v_segment":
+            case "v_gene_segment":
                 return Optional.of(Biotype.IG_V_gene);
             case "ig_d_gene":
+            case "d_segment":
+            case "d_gene_segment":
                 return Optional.of(Biotype.IG_D_gene);
 
             case "ig_pseudogene":
                 return Optional.of(Biotype.IG_pseudogene);
             case "ig_c_pseudogene":
+            case "c_region_pseudogene":
                 return Optional.of(Biotype.IG_C_pseudogene);
             case "ig_j_pseudogene":
+            case "j_segment_pseudogene":
                 return Optional.of(Biotype.IG_J_pseudogene);
             case "ig_v_pseudogene":
+            case "v_segment_pseudogene":
                 return Optional.of(Biotype.IG_V_pseudogene);
 
             case "tr_c_gene":
@@ -415,8 +444,13 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
                 return Optional.of(Biotype.MT_rRNA);
             case "mt_trna":
                 return Optional.of(Biotype.MT_tRNA);
+            case "transcript":
+                return Optional.of(Biotype.transcript);
             case "ribozyme":
+            case "rnase_p_rna":
+                return Optional.of(Biotype.ribozyme);
             case "tec":
+            case "other":
             case "rrna_pseudogene":
             default:
                 return Optional.of(Biotype.unknown);

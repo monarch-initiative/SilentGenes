@@ -65,8 +65,10 @@ public class GencodeGeneImpl extends BaseGene implements GencodeGene {
     @Override
     public String toString() {
         return "GencodeGeneImpl{" +
-                "transcripts=" + transcripts +
+                "id=" + id +
+                ", location=" + location +
+                ", transcripts=" + transcripts +
                 ", gencodeMetadata=" + gencodeMetadata +
-                "} " + super.toString();
+                "}";
     }
 }

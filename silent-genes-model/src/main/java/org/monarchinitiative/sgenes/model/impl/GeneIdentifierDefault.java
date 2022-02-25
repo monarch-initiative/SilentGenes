@@ -46,8 +46,10 @@ public class GeneIdentifierDefault extends IdentifierDefault implements GeneIden
     @Override
     public String toString() {
         return "GeneIdentifierDefault{" +
-                "hgncId='" + hgncId + '\'' +
+                "accession='" + accession() + '\'' +
+                ", symbol='" + symbol() + '\'' +
+                ", hgncId='" + hgncId + '\'' +
                 ", ncbiGeneId='" + ncbiGeneId + '\'' +
-                "} " + super.toString();
+                '}';
     }
 }
