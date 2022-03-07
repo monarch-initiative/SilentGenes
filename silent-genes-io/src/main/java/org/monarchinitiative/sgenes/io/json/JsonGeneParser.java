@@ -8,14 +8,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.monarchinitiative.sgenes.io.GeneParser;
 import org.monarchinitiative.sgenes.io.json.deserialize.*;
 import org.monarchinitiative.sgenes.io.json.serialize.*;
+import org.monarchinitiative.sgenes.model.*;
 import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.svart.GenomicRegion;
-import org.monarchinitiative.sgenes.model.Gene;
-import org.monarchinitiative.sgenes.model.GeneIdentifier;
-import org.monarchinitiative.sgenes.model.Transcript;
-import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,17 +47,19 @@ public class JsonGeneParser implements GeneParser {
         module.addSerializer(new CoordinateSerializer());
         module.addSerializer(new GenomicRegionSerializer());
         module.addSerializer(new TranscriptIdentifierSerializer());
+        module.addSerializer(new TranscriptMetadataSerializer());
         module.addSerializer(new TranscriptSerializer());
         module.addSerializer(new GeneIdentifierSerializer());
         module.addSerializer(new GeneSerializer());
 
         // deserializers
         module.addDeserializer(Coordinates.class, new CoordinateDeserializer());
-        module.addDeserializer(Gene.class, new GeneDeserializer());
-        module.addDeserializer(GeneIdentifier.class, new GeneIdentifierDeserializer());
         module.addDeserializer(GenomicRegion.class, new GenomicRegionDeserializer(assembly));
-        module.addDeserializer(Transcript.class, new TranscriptDeserializer());
         module.addDeserializer(TranscriptIdentifier.class, new TranscriptIdentifierDeserializer());
+        module.addDeserializer(TranscriptMetadata.class, new TranscriptMetadataDeserializer());
+        module.addDeserializer(Transcript.class, new TranscriptDeserializer());
+        module.addDeserializer(GeneIdentifier.class, new GeneIdentifierDeserializer());
+        module.addDeserializer(Gene.class, new GeneDeserializer());
 
         return module;
     }

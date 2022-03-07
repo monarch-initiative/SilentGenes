@@ -1,6 +1,7 @@
 package org.monarchinitiative.sgenes.model.base;
 
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
+import org.monarchinitiative.sgenes.model.TranscriptMetadata;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.sgenes.model.CodingTranscript;
@@ -15,8 +16,9 @@ public abstract class BaseCodingTranscript extends BaseTranscript implements Cod
     protected BaseCodingTranscript(TranscriptIdentifier id,
                                    GenomicRegion location,
                                    List<Coordinates> exons,
-                                   Coordinates cdsCoordinates) {
-        super(id, location, exons);
+                                   Coordinates cdsCoordinates,
+                                   TranscriptMetadata metadata) {
+        super(id, location, exons, metadata);
         this.cdsCoordinates = Objects.requireNonNull(cdsCoordinates, "CDS coordinates must not be null");
     }
 

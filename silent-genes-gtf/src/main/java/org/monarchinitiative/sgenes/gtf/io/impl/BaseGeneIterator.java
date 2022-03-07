@@ -29,8 +29,8 @@ import java.util.zip.GZIPInputStream;
  * The base GTF iterator that iterates through a GTF file and assembles {@link GENE}s from a list of {@link GtfRecord}s.
  * The inheritor is required to implement {@link #assembleGene(String, List)}.
  *
- * @param <GENE>
- * @param <METADATA>
+ * @param <GENE>     gene type
+ * @param <METADATA> container for gene-related metadata
  */
 abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcript> implements Iterator<GENE> {
 
@@ -197,7 +197,7 @@ abstract class BaseGeneIterator<GENE extends Gene, METADATA, TX extends Transcri
     protected abstract GENE newGeneInstance(GeneIdentifier geneIdentifier,
                                             GenomicRegion location,
                                             List<TX> transcripts,
-                                            METADATA metadata);
+                                            METADATA geneMetadata);
 
     protected Optional<GtfGeneData> partitionGtfLines(String geneId, List<GtfRecord> records) {
         GtfRecord gene = null;

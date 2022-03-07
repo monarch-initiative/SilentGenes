@@ -1,8 +1,6 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.refseq;
 
-import org.monarchinitiative.sgenes.gtf.model.RefseqMetadata;
-import org.monarchinitiative.sgenes.gtf.model.RefseqSource;
-import org.monarchinitiative.sgenes.gtf.model.RefseqTranscript;
+import org.monarchinitiative.sgenes.gtf.model.*;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 import org.monarchinitiative.sgenes.model.base.BaseTranscript;
 import org.monarchinitiative.svart.Coordinates;
@@ -14,24 +12,22 @@ import java.util.Objects;
 public class RefseqNoncodingTranscript extends BaseTranscript implements RefseqTranscript {
 
     private final RefseqSource source;
-    private final RefseqMetadata refseqMetadata;
 
     public static RefseqNoncodingTranscript of(TranscriptIdentifier id,
                                                GenomicRegion location,
                                                List<Coordinates> exons,
                                                RefseqSource source,
-                                               RefseqMetadata refseqMetadata) {
-        return new RefseqNoncodingTranscript(id, location, exons, source, refseqMetadata);
+                                               RefseqTranscriptMetadata metadata) {
+        return new RefseqNoncodingTranscript(id, location, exons, source, metadata);
     }
 
     protected RefseqNoncodingTranscript(TranscriptIdentifier id,
                                         GenomicRegion location,
                                         List<Coordinates> exons,
                                         RefseqSource source,
-                                        RefseqMetadata refseqMetadata) {
-        super(id, location, exons);
+                                        RefseqTranscriptMetadata metadata) {
+        super(id, location, exons, metadata);
         this.source = Objects.requireNonNull(source, "Refseq source must not be null");
-        this.refseqMetadata = Objects.requireNonNull(refseqMetadata, "Refseq metadata must not be null");
     }
 
     @Override
@@ -40,8 +36,8 @@ public class RefseqNoncodingTranscript extends BaseTranscript implements RefseqT
     }
 
     @Override
-    public RefseqMetadata refseqMetadata() {
-        return refseqMetadata;
+    public Biotype biotype() {
+        return ((RefseqTranscriptMetadata) metadata()).biotype();
     }
 
     @Override
@@ -50,12 +46,12 @@ public class RefseqNoncodingTranscript extends BaseTranscript implements RefseqT
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         RefseqNoncodingTranscript that = (RefseqNoncodingTranscript) o;
-        return source == that.source && Objects.equals(refseqMetadata, that.refseqMetadata);
+        return source == that.source;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), source, refseqMetadata);
+        return Objects.hash(super.hashCode(), source);
     }
 
     @Override
@@ -65,7 +61,7 @@ public class RefseqNoncodingTranscript extends BaseTranscript implements RefseqT
                 ", source=" + source +
                 ", location=" + location() +
                 ", exons=" + exons() +
-                ", refseqMetadata=" + refseqMetadata +
+                ", metadata=" + metadata() +
                 "}";
     }
 }

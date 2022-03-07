@@ -9,21 +9,22 @@ import org.monarchinitiative.svart.GenomicRegion;
 
 import java.util.List;
 
-public interface RefseqTranscript extends Transcript, RefseqAnnotated {
+public interface RefseqTranscript extends Transcript {
 
     static RefseqTranscript of(TranscriptIdentifier id,
                                GenomicRegion location,
                                List<Coordinates> exons,
                                RefseqSource source,
-                               RefseqMetadata refseqMetadata,
+                               RefseqTranscriptMetadata metadata,
                                Coordinates cdsCoordinates) {
         if (cdsCoordinates == null) {
-            return RefseqNoncodingTranscript.of(id, location, exons, source, refseqMetadata);
+            return RefseqNoncodingTranscript.of(id, location, exons, source, metadata);
         } else {
-            return RefseqCodingTranscript.of(id, location, exons, source, refseqMetadata, cdsCoordinates);
+            return RefseqCodingTranscript.of(id, location, exons, source, metadata, cdsCoordinates);
         }
     }
 
     RefseqSource source();
 
+    Biotype biotype();
 }

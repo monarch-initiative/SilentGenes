@@ -1,8 +1,6 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.gencode;
 
-import org.monarchinitiative.sgenes.gtf.model.GencodeGene;
-import org.monarchinitiative.sgenes.gtf.model.GencodeMetadata;
-import org.monarchinitiative.sgenes.gtf.model.GencodeTranscript;
+import org.monarchinitiative.sgenes.gtf.model.*;
 import org.monarchinitiative.sgenes.model.base.BaseGene;
 import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.sgenes.model.GeneIdentifier;
@@ -12,30 +10,40 @@ import java.util.*;
 public class GencodeGeneImpl extends BaseGene implements GencodeGene {
 
     private final List<? extends GencodeTranscript> transcripts;
-    private final GencodeMetadata gencodeMetadata;
+    private final GencodeTranscriptMetadata metadata;
 
     public static GencodeGeneImpl of(GeneIdentifier id,
                                      GenomicRegion location,
                                      List<GencodeTranscript> transcripts,
-                                     GencodeMetadata gencodeMetadata) {
-        return new GencodeGeneImpl(id, location, transcripts, gencodeMetadata);
+                                     GencodeTranscriptMetadata metadata) {
+        return new GencodeGeneImpl(id, location, transcripts, metadata);
     }
 
     private GencodeGeneImpl(GeneIdentifier id,
                             GenomicRegion location,
                             List<GencodeTranscript> transcripts,
-                            GencodeMetadata gencodeMetadata) {
+                            GencodeTranscriptMetadata metadata) {
         super(id, location);
         this.transcripts = Objects.requireNonNull(transcripts, "Transcripts must not be null");
         if (this.transcripts.isEmpty())
             throw new IllegalArgumentException("Transcripts must not be empty");
-        this.gencodeMetadata = Objects.requireNonNull(gencodeMetadata, "Gencode metadata must not be null");
+        this.metadata = Objects.requireNonNull(metadata, "Gencode metadata must not be null");
 
     }
 
     @Override
-    public GencodeMetadata gencodeMetadata() {
-        return gencodeMetadata;
+    public Biotype biotype() {
+        return metadata.biotype();
+    }
+
+    @Override
+    public EvidenceLevel evidenceLevel() {
+        return metadata.evidenceLevel();
+    }
+
+    @Override
+    public Set<String> tags() {
+        return metadata.tags();
     }
 
     @Override
@@ -54,12 +62,12 @@ public class GencodeGeneImpl extends BaseGene implements GencodeGene {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         GencodeGeneImpl that = (GencodeGeneImpl) o;
-        return Objects.equals(transcripts, that.transcripts) && Objects.equals(gencodeMetadata, that.gencodeMetadata);
+        return Objects.equals(transcripts, that.transcripts) && Objects.equals(metadata, that.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), transcripts, gencodeMetadata);
+        return Objects.hash(super.hashCode(), transcripts, metadata);
     }
 
     @Override
@@ -68,7 +76,7 @@ public class GencodeGeneImpl extends BaseGene implements GencodeGene {
                 "id=" + id +
                 ", location=" + location +
                 ", transcripts=" + transcripts +
-                ", gencodeMetadata=" + gencodeMetadata +
+                ", gencodeMetadata=" + metadata +
                 "}";
     }
 }

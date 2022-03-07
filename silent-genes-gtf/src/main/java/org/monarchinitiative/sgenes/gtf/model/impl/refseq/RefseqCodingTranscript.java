@@ -1,6 +1,6 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.refseq;
 
-import org.monarchinitiative.sgenes.gtf.model.RefseqMetadata;
+import org.monarchinitiative.sgenes.gtf.model.RefseqTranscriptMetadata;
 import org.monarchinitiative.sgenes.gtf.model.RefseqSource;
 import org.monarchinitiative.sgenes.model.CodingTranscript;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
@@ -18,18 +18,18 @@ public class RefseqCodingTranscript extends RefseqNoncodingTranscript implements
                                             GenomicRegion location,
                                             List<Coordinates> exons,
                                             RefseqSource source,
-                                            RefseqMetadata refseqMetadata,
+                                            RefseqTranscriptMetadata metadata,
                                             Coordinates cdsCoordinates) {
-        return new RefseqCodingTranscript(id, location, exons, refseqMetadata, source, cdsCoordinates);
+        return new RefseqCodingTranscript(id, location, exons, metadata, source, cdsCoordinates);
     }
 
     private RefseqCodingTranscript(TranscriptIdentifier id,
                                    GenomicRegion location,
                                    List<Coordinates> exons,
-                                   RefseqMetadata refseqMetadata,
+                                   RefseqTranscriptMetadata metadata,
                                    RefseqSource source,
                                    Coordinates cdsCoordinates) {
-        super(id, location, exons, source, refseqMetadata);
+        super(id, location, exons, source, metadata);
         this.cdsCoordinates = Objects.requireNonNull(cdsCoordinates, "CDS coordinates must not be null");
     }
 
@@ -58,7 +58,7 @@ public class RefseqCodingTranscript extends RefseqNoncodingTranscript implements
                 "id=" + id() +
                 ", location=" + location() +
                 ", exons=" + exons() +
-                ", refseqMetadata=" + refseqMetadata() +
+                ", metadata=" + metadata() +
                 ", cdsCoordinates=" + cdsCoordinates +
                 "}";
     }

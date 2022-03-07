@@ -8,7 +8,9 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface RefseqGene extends Gene, RefseqAnnotated {
+public interface RefseqGene extends Gene {
+
+    Biotype biotype();
 
     @Override
     Iterator<? extends RefseqTranscript> transcripts();

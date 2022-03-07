@@ -24,7 +24,7 @@ public class TestInstances {
                     Coordinates.of(CoordinateSystem.zeroBased(), 900, 950)
             );
             Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 150, 825);
-            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
+            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates, TranscriptMetadata.of(null));
         }
     }
 
@@ -48,7 +48,7 @@ public class TestInstances {
                     Coordinates.of(CoordinateSystem.zeroBased(), 7668402, 7669690).invert(contig)
             );
             Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 7669608, 7675215).invert(contig);
-            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
+            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates, TranscriptMetadata.of(null));
         }
     }
 

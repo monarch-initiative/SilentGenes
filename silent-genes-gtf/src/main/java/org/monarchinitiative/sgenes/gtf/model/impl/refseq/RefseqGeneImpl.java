@@ -1,7 +1,7 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.refseq;
 
+import org.monarchinitiative.sgenes.gtf.model.Biotype;
 import org.monarchinitiative.sgenes.gtf.model.RefseqGene;
-import org.monarchinitiative.sgenes.gtf.model.RefseqMetadata;
 import org.monarchinitiative.sgenes.gtf.model.RefseqTranscript;
 import org.monarchinitiative.sgenes.model.GeneIdentifier;
 import org.monarchinitiative.sgenes.model.base.BaseGene;
@@ -14,24 +14,24 @@ import java.util.Objects;
 public class RefseqGeneImpl extends BaseGene implements RefseqGene {
 
     private final List<? extends RefseqTranscript> transcripts;
-    private final RefseqMetadata refseqMetadata;
+    private final Biotype biotype;
 
     public static RefseqGeneImpl of(GeneIdentifier identifier,
                                     GenomicRegion location,
                                     List<? extends RefseqTranscript> transcripts,
-                                    RefseqMetadata refseqMetadata) {
-        return new RefseqGeneImpl(identifier, location, transcripts, refseqMetadata);
+                                    Biotype biotype) {
+        return new RefseqGeneImpl(identifier, location, transcripts, biotype);
     }
 
     private RefseqGeneImpl(GeneIdentifier identifier,
                    GenomicRegion location,
                    List<? extends RefseqTranscript> transcripts,
-                   RefseqMetadata refseqMetadata) {
+                   Biotype biotype) {
         super(identifier, location);
         this.transcripts = Objects.requireNonNull(transcripts, "Transcripts must not be null");
         if (this.transcripts.isEmpty())
             throw new IllegalArgumentException("Transcripts must not be empty");
-        this.refseqMetadata = Objects.requireNonNull(refseqMetadata, "Refseq metadata must not be empty");
+        this.biotype = Objects.requireNonNull(biotype, "Biotype must not be empty");
     }
 
     @Override
@@ -45,8 +45,8 @@ public class RefseqGeneImpl extends BaseGene implements RefseqGene {
     }
 
     @Override
-    public RefseqMetadata refseqMetadata() {
-        return refseqMetadata;
+    public Biotype biotype() {
+        return biotype;
     }
 
     @Override
@@ -55,12 +55,12 @@ public class RefseqGeneImpl extends BaseGene implements RefseqGene {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         RefseqGeneImpl that = (RefseqGeneImpl) o;
-        return Objects.equals(transcripts, that.transcripts) && Objects.equals(refseqMetadata, that.refseqMetadata);
+        return Objects.equals(transcripts, that.transcripts) && Objects.equals(biotype, that.biotype);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), transcripts, refseqMetadata);
+        return Objects.hash(super.hashCode(), transcripts, biotype);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RefseqGeneImpl extends BaseGene implements RefseqGene {
                 "id=" + id +
                 ", location=" + location +
                 ", transcripts=" + transcripts +
-                ", refseqMetadata=" + refseqMetadata +
+                ", biotype=" + biotype +
                 "}";
     }
 }

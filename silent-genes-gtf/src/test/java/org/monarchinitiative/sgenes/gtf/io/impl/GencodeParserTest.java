@@ -2,9 +2,9 @@ package org.monarchinitiative.sgenes.gtf.io.impl;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.monarchinitiative.sgenes.model.FeatureSource;
 import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
-import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.svart.Strand;
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,7 +33,7 @@ public class GencodeParserTest {
 
 
     @Nested
-    public class SmallGtfFile {
+    public class SmallGtfFileTest {
 
         @Test
         public void iterate() {
@@ -75,6 +74,8 @@ public class GencodeParserTest {
             assertThat(surf2.id().hgncId().isPresent(), equalTo(true));
             assertThat(surf2.id().hgncId().get(), equalTo("HGNC:11475"));
             assertThat(surf2.evidenceLevel(), equalTo(EvidenceLevel.MANUALLY_ANNOTATED));
+            assertThat(surf2.featureSource().isPresent(), equalTo(true));
+            assertThat(surf2.featureSource().get(), equalTo(FeatureSource.GENCODE));
 
             assertThat(surf2.biotype(), equalTo(Biotype.protein_coding));
             assertThat(surf2.tags(), empty());
@@ -96,6 +97,8 @@ public class GencodeParserTest {
             assertThat(fbn1.id().hgncId().get(), equalTo("HGNC:3603"));
             assertThat(fbn1.evidenceLevel(), equalTo(EvidenceLevel.VERIFIED));
 
+            assertThat(fbn1.featureSource().isPresent(), equalTo(true));
+            assertThat(fbn1.featureSource().get(), equalTo(FeatureSource.GENCODE));
             assertThat(fbn1.biotype(), equalTo(Biotype.protein_coding));
             assertThat(fbn1.tags(), hasItems("overlapping_locus"));
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.monarchinitiative.sgenes.model.TranscriptMetadata;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.sgenes.model.Transcript;
@@ -33,6 +34,7 @@ public class TranscriptDeserializer extends StdDeserializer<Transcript> {
         JsonNode node = codec.readTree(jp);
 
         TranscriptIdentifier id = codec.treeToValue(node.get("id"), TranscriptIdentifier.class);
+        TranscriptMetadata metadata = codec.treeToValue(node.get("metadata"), TranscriptMetadata.class);
         GenomicRegion location = codec.treeToValue(node.get("loc"), GenomicRegion.class);
 
         Iterator<JsonNode> exonIterator = node.get("exons").elements();
@@ -47,7 +49,7 @@ public class TranscriptDeserializer extends StdDeserializer<Transcript> {
             cdsCoordinates = codec.treeToValue(node.get("cdsCoordinates"), Coordinates.class);
         }
 
-        return Transcript.of(id, location, exons, cdsCoordinates);
+        return Transcript.of(id, location, exons, cdsCoordinates, metadata);
     }
 
 }

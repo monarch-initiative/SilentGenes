@@ -85,36 +85,39 @@ public class JannovarIterator implements Iterator<Gene> {
         for (TranscriptModel tx : transcripts) {
             // Symbol is not transferred, nor is ccdsId
             TranscriptIdentifier txId = TranscriptIdentifier.of(tx.getAccession(), "", null);
+            TranscriptMetadata metadata = TranscriptMetadata.of(parseTranscriptSupportLevel(tx.getTranscriptSupportLevel()));
             if (tx.isCoding()) {
-                txs.add(parseCodingTranscript(contig, strand, txId, tx));
+                txs.add(parseCodingTranscript(contig, strand, txId, metadata, tx));
             } else {
-                txs.add(parseNoncodingTranscript(contig, strand, txId, tx));
+                txs.add(parseNoncodingTranscript(contig, strand, txId, metadata, tx));
             }
         }
 
         return Collections.unmodifiableList(txs);
     }
 
-    private static Transcript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
+    private static TranscriptEvidence parseTranscriptSupportLevel(int transcriptSupportLevel) {
+        // TODO - implement a proper parse
+        return null;
+    }
+
+    private static Transcript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptMetadata metadata, TranscriptModel tx) {
         GenomeInterval txRegion = tx.getTXRegion();
         GenomicRegion location = GenomicRegion.of(contig, strand, COORDINATE_SYSTEM, txRegion.getBeginPos(), txRegion.getEndPos());
         List<Coordinates> exons = remapExons(tx.getExonRegions());
         GenomeInterval cds = tx.getCDSRegion();
         Coordinates cdsCoordinates = Coordinates.of(COORDINATE_SYSTEM, cds.getBeginPos(), cds.getEndPos());
-//        Coordinates stopCodon = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() - 3, cds.getEndPos());
-//        Coordinates fivePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, txRegion.getBeginPos(), cds.getBeginPos() - 1);
-//        Coordinates threePrimeRegion = Coordinates.of(COORDINATE_SYSTEM, cds.getEndPos() + 2, txRegion.getEndPos());
 
-        return Transcript.of(txId, location, exons, cdsCoordinates);
+        return Transcript.of(txId, location, exons, cdsCoordinates, metadata);
     }
 
-    private static Transcript parseNoncodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptModel tx) {
+    private static Transcript parseNoncodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptMetadata metadata, TranscriptModel tx) {
 
         GenomeInterval txRegion = tx.getTXRegion();
         GenomicRegion location = GenomicRegion.of(contig, strand, COORDINATE_SYSTEM, txRegion.getBeginPos(), txRegion.getEndPos());
         List<Coordinates> exons = remapExons(tx.getExonRegions());
 
-        return Transcript.of(txId, location, exons, null);
+        return Transcript.of(txId, location, exons, null, metadata);
     }
 
     private static List<Coordinates> remapExons(List<GenomeInterval> exonRegions) {

@@ -18,7 +18,7 @@ import java.util.Objects;
  * The implementors must ensure that the exons are arranged in ascending order and the exons do not overlap.
  * </ul>
  */
-public interface Transcript extends Located, Identified<TranscriptIdentifier> {
+public interface Transcript extends Located, Identified<TranscriptIdentifier>, Annotated<TranscriptMetadata> {
 
     /**
      * Create a new {@link Transcript} instance.
@@ -29,40 +29,42 @@ public interface Transcript extends Located, Identified<TranscriptIdentifier> {
      * @param cdsCoordinates coordinates of the coding region, or <code>null</code> for non-coding transcript.
      *                       The expected <code>cdsCoordinates</code> spans the coordinates
      *                       delimited by start and stop codons (included), including intronic sequences.
+     * @param metadata       transcript metadata
      * @return transcript instance
      */
     static Transcript of(TranscriptIdentifier id,
                          GenomicRegion location,
                          List<Coordinates> exons,
-                         Coordinates cdsCoordinates) {
+                         Coordinates cdsCoordinates,
+                         TranscriptMetadata metadata) {
         Objects.requireNonNull(exons, "Exons must not be null");
         if (exons.isEmpty())
             throw new IllegalArgumentException("Exon list must not be empty");
         if (cdsCoordinates == null)
-            return TranscriptDefault.of(id, location, exons);
+            return TranscriptDefault.of(id, location, exons, metadata);
         else
-            return CodingTranscriptDefault.of(id, location, exons, cdsCoordinates);
+            return CodingTranscriptDefault.of(id, location, exons, cdsCoordinates, metadata);
     }
 
     /**
-     * Use {@link #of(TranscriptIdentifier, GenomicRegion, List, Coordinates)} and pass null for <code>cdsCoordinates</code>
+     * @deprecated use {@link #of(TranscriptIdentifier, GenomicRegion, List, Coordinates, TranscriptMetadata)} and pass null for <code>cdsCoordinates</code>
      */
-    @Deprecated
+    @Deprecated(since = "0.2.1", forRemoval = true)
     static Transcript noncoding(TranscriptIdentifier id,
                                 GenomicRegion location,
                                 List<Coordinates> exons) {
-        return TranscriptDefault.of(id, location, exons);
+        return of(id, location, exons, null, TranscriptMetadata.of(null));
     }
 
     /**
-     * Use {@link #of(TranscriptIdentifier, GenomicRegion, List, Coordinates)}
+     * Use {@link #of(TranscriptIdentifier, GenomicRegion, List, Coordinates, TranscriptMetadata)}
      */
-    @Deprecated
+    @Deprecated(since = "0.2.1", forRemoval = true)
     static CodingTranscript coding(TranscriptIdentifier id,
                                    GenomicRegion location,
                                    List<Coordinates> exons,
                                    Coordinates cdsCoordinates) {
-        return CodingTranscriptDefault.of(id, location, exons, cdsCoordinates);
+        return (CodingTranscript) of(id, location, exons, cdsCoordinates, TranscriptMetadata.of(null));
     }
 
     private static List<Coordinates> computeIntronLocations(List<Coordinates> exons) {

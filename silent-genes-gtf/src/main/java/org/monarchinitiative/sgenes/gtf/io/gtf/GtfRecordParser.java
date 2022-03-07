@@ -158,7 +158,7 @@ public class GtfRecordParser {
         }
     }
 
-    static Map<String, List<String>> parseAttributes(String payload) throws GtfParseException {
+    static Map<String, List<String>> parseAttributes(String payload) {
         Map<String, List<String>> attributes = new HashMap<>(N_ATTRIBUTE_FIELDS);
         String[] tokens = payload.split(";");
 
