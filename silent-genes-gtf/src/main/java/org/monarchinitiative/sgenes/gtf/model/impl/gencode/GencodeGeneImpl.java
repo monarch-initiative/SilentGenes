@@ -32,11 +32,6 @@ public class GencodeGeneImpl extends BaseGene implements GencodeGene {
     }
 
     @Override
-    public GencodeTranscriptMetadata gencodeMetadata() {
-        return metadata;
-    }
-
-    @Override
     public Biotype biotype() {
         return metadata.biotype();
     }

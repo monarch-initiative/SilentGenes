@@ -11,23 +11,14 @@ import java.util.stream.StreamSupport;
 
 public interface GencodeGene extends Gene {
 
-    @Deprecated
-    GencodeTranscriptMetadata gencodeMetadata();
+    // TODO - evaluate how useful is it to have metadata on the gene level
+    Biotype biotype();
 
     // TODO - evaluate how useful is it to have metadata on the gene level
-    default Biotype biotype() {
-        return gencodeMetadata().biotype();
-    }
+    EvidenceLevel evidenceLevel();
 
     // TODO - evaluate how useful is it to have metadata on the gene level
-    default EvidenceLevel evidenceLevel() {
-        return gencodeMetadata().evidenceLevel();
-    }
-
-    // TODO - evaluate how useful is it to have metadata on the gene level
-    default Set<String> tags() {
-        return gencodeMetadata().tags();
-    }
+    Set<String> tags();
 
     @Override
     Iterator<? extends GencodeTranscript> transcripts();
