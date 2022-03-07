@@ -1,6 +1,8 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.gencode;
 
-import org.monarchinitiative.sgenes.gtf.model.GencodeMetadata;
+import org.monarchinitiative.sgenes.gtf.model.Biotype;
+import org.monarchinitiative.sgenes.gtf.model.EvidenceLevel;
+import org.monarchinitiative.sgenes.gtf.model.GencodeTranscriptMetadata;
 import org.monarchinitiative.sgenes.gtf.model.GencodeTranscript;
 import org.monarchinitiative.sgenes.model.base.BaseTranscript;
 import org.monarchinitiative.svart.Coordinates;
@@ -8,53 +10,46 @@ import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 public class GencodeNoncodingTranscript extends BaseTranscript implements GencodeTranscript {
-
-    private final GencodeMetadata gencodeMetadata;
 
     public static GencodeNoncodingTranscript of(TranscriptIdentifier id,
                                                 GenomicRegion location,
                                                 List<Coordinates> exons,
-                                                GencodeMetadata gencodeMetadata) {
-        return new GencodeNoncodingTranscript(id, location, exons, gencodeMetadata);
+                                                GencodeTranscriptMetadata gencodeTranscriptMetadata) {
+        return new GencodeNoncodingTranscript(id, location, exons, gencodeTranscriptMetadata);
     }
 
     GencodeNoncodingTranscript(TranscriptIdentifier id,
                                GenomicRegion location,
                                List<Coordinates> exons,
-                               GencodeMetadata gencodeMetadata) {
-        super(id, location, exons);
-        this.gencodeMetadata = Objects.requireNonNull(gencodeMetadata, "Gencode metadata must not be null");
+                               GencodeTranscriptMetadata gencodeTranscriptMetadata) {
+        super(id, location, exons, gencodeTranscriptMetadata);
     }
 
     @Override
-    public GencodeMetadata gencodeMetadata() {
-        return gencodeMetadata;
+    public Biotype biotype() {
+        return ((GencodeTranscriptMetadata) metadata()).biotype();
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        GencodeNoncodingTranscript that = (GencodeNoncodingTranscript) o;
-        return Objects.equals(gencodeMetadata, that.gencodeMetadata);
+    public EvidenceLevel evidenceLevel() {
+        return ((GencodeTranscriptMetadata) metadata()).evidenceLevel();
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), gencodeMetadata);
+    public Set<String> tags() {
+        return ((GencodeTranscriptMetadata) metadata()).tags();
     }
 
     @Override
     public String toString() {
         return "GencodeNoncodingTranscript{" +
                 "id=" + id() +
+                ", metadata=" + metadata() +
                 ", location=" + location() +
                 ", exons=" + exons() +
-                ", gencodeMetadata=" + gencodeMetadata +
                 "}";
     }
 }

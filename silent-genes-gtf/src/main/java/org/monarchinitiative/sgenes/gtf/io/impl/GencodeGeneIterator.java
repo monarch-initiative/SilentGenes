@@ -3,10 +3,11 @@ package org.monarchinitiative.sgenes.gtf.io.impl;
 import org.monarchinitiative.sgenes.gtf.model.Biotype;
 import org.monarchinitiative.sgenes.gtf.model.EvidenceLevel;
 import org.monarchinitiative.sgenes.gtf.model.GencodeGene;
-import org.monarchinitiative.sgenes.gtf.model.GencodeMetadata;
+import org.monarchinitiative.sgenes.gtf.model.GencodeTranscriptMetadata;
 import org.monarchinitiative.sgenes.gtf.model.GencodeTranscript;
 import org.monarchinitiative.sgenes.gtf.model.impl.gencode.GencodeGeneImpl;
 import org.monarchinitiative.sgenes.gtf.io.gtf.GtfRecord;
+import org.monarchinitiative.sgenes.model.TranscriptEvidence;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
@@ -18,7 +19,7 @@ import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 import java.nio.file.Path;
 import java.util.*;
 
-class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeMetadata, GencodeTranscript> {
+class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeTranscriptMetadata, GencodeTranscript> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GencodeGeneIterator.class);
 
@@ -42,7 +43,7 @@ class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeMetadata,
     }
 
     @Override
-    protected Optional<GencodeMetadata> parseGeneMetadata(String geneId, GtfRecord gene) {
+    protected Optional<GencodeTranscriptMetadata> parseGeneMetadata(String geneId, GtfRecord gene) {
         Optional<Biotype> biotype = parseBiotype(gene.firstAttribute("gene_type"));
         if (biotype.isEmpty()) {
             LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", gene.attribute("gene_name"), geneId);
@@ -54,7 +55,7 @@ class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeMetadata,
             LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", gene.attribute("level"), geneId);
             return Optional.empty();
         }
-        return Optional.of(GencodeMetadata.of(biotype.get(), evidenceLevel.get(), gene.tags()));
+        return Optional.of(GencodeTranscriptMetadata.of(null, biotype.get(), evidenceLevel.get(), gene.tags()));
     }
 
     private static Optional<EvidenceLevel> parseEvidenceLevel(String level) {
@@ -78,7 +79,7 @@ class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeMetadata,
                                                             GtfRecord stopCodon) {
         TranscriptIdentifier txIdentifier = TranscriptIdentifier.of(txId, tx.firstAttribute("transcript_name"), tx.firstAttribute("ccdsid"));
 
-        Optional<GencodeMetadata> metadata = parseTranscriptMetadata(txId, tx);
+        Optional<GencodeTranscriptMetadata> metadata = parseTranscriptMetadata(txId, tx);
         if (metadata.isEmpty())
             return Optional.empty();
 
@@ -99,19 +100,21 @@ class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeMetadata,
     protected GencodeGene newGeneInstance(GeneIdentifier geneIdentifier,
                                           GenomicRegion location,
                                           List<GencodeTranscript> transcripts,
-                                          GencodeMetadata gencodeMetadata) {
+                                          GencodeTranscriptMetadata geneMetadata) {
         return GencodeGeneImpl.of(geneIdentifier,
                 location,
                 transcripts,
-                gencodeMetadata);
+                geneMetadata);
     }
 
-    private static Optional<GencodeMetadata> parseTranscriptMetadata(String txId, GtfRecord tx) {
+    private static Optional<GencodeTranscriptMetadata> parseTranscriptMetadata(String txId, GtfRecord tx) {
         Optional<EvidenceLevel> level = parseEvidenceLevel(tx.firstAttribute("level"));
         if (level.isEmpty()) {
             LOGGER.warn("Unable to parse evidence level `{}` for gene `{}`", tx.attribute("level"), txId);
             return Optional.empty();
         }
+
+        TranscriptEvidence evidence = mapEvidenceLevel(level.get());
 
         Optional<Biotype> biotype = parseBiotype(tx.firstAttribute("transcript_type"));
         if (biotype.isEmpty()) {
@@ -119,7 +122,21 @@ class GencodeGeneIterator extends BaseGeneIterator<GencodeGene, GencodeMetadata,
             return Optional.empty();
         }
 
-        return Optional.of(GencodeMetadata.of(biotype.get(), level.get(), tx.tags()));
+        return Optional.of(GencodeTranscriptMetadata.of(evidence, biotype.get(), level.get(), tx.tags()));
+    }
+
+    private static TranscriptEvidence mapEvidenceLevel(EvidenceLevel evidenceLevel) {
+        switch (evidenceLevel) {
+            case VERIFIED:
+                return TranscriptEvidence.VALIDATED;
+            case MANUALLY_ANNOTATED:
+                return TranscriptEvidence.MANUAL_ANNOTATION;
+            case AUTOMATICALLY_ANNOTATED:
+                return TranscriptEvidence.AUTOMATED_ANNOTATION;
+            default:
+                LOGGER.warn("Unknown evidence level `{}`", evidenceLevel);
+                return null;
+        }
     }
 
 

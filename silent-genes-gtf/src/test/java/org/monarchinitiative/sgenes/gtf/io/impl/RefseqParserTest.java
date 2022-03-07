@@ -6,9 +6,7 @@ import org.monarchinitiative.sgenes.gtf.model.Biotype;
 import org.monarchinitiative.sgenes.gtf.model.RefseqGene;
 import org.monarchinitiative.sgenes.gtf.model.RefseqSource;
 import org.monarchinitiative.sgenes.gtf.model.RefseqTranscript;
-import org.monarchinitiative.sgenes.model.Coding;
-import org.monarchinitiative.sgenes.model.CodingTranscript;
-import org.monarchinitiative.sgenes.model.Identified;
+import org.monarchinitiative.sgenes.model.*;
 import org.monarchinitiative.svart.CoordinateSystem;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
@@ -84,10 +82,16 @@ public class RefseqParserTest {
             assertThat(surf2.id().ncbiGeneId().get(), equalTo("NCBIGene:6835"));
 
             // Metadata
-            assertThat(surf2.refseqMetadata().biotype(), equalTo(Biotype.protein_coding));
+            assertThat(surf2.biotype(), equalTo(Biotype.protein_coding));
 
             // Transcripts
             assertThat(surf2.transcriptCount(), equalTo(2));
+            Iterator<? extends RefseqTranscript> surf2Iterator = surf2.transcripts();
+            RefseqTranscript surf2Tx = surf2Iterator.next();
+            assertThat(surf2Tx.evidence().isPresent(), equalTo(true));
+            assertThat(surf2Tx.evidence().get(), equalTo(TranscriptEvidence.KNOWN));
+            assertThat(surf2Tx.featureSource().isPresent(), equalTo(true));
+            assertThat(surf2Tx.featureSource().get(), equalTo(FeatureSource.REFSEQ));
 
             // ----------------------------------------- FBN1 ----------------------------------------------------------
             RefseqGene fbn1 = genes.get(1);
@@ -108,10 +112,16 @@ public class RefseqParserTest {
             assertThat(fbn1.id().ncbiGeneId().get(), equalTo("NCBIGene:2200"));
 
             // Metadata
-            assertThat(fbn1.refseqMetadata().biotype(), equalTo(Biotype.protein_coding));
+            assertThat(fbn1.biotype(), equalTo(Biotype.protein_coding));
 
             // Transcripts
             assertThat(fbn1.transcriptCount(), equalTo(1));
+            Iterator<? extends RefseqTranscript> fbn1Iterator = fbn1.transcripts();
+            RefseqTranscript fbn1Tx = fbn1Iterator.next();
+            assertThat(fbn1Tx.evidence().isPresent(), equalTo(true));
+            assertThat(fbn1Tx.evidence().get(), equalTo(TranscriptEvidence.KNOWN));
+            assertThat(fbn1Tx.featureSource().isPresent(), equalTo(true));
+            assertThat(fbn1Tx.featureSource().get(), equalTo(FeatureSource.REFSEQ));
 
             Map<String, Coordinates> cdsCoordinates = fbn1.codingTranscripts()
                     .collect(Collectors.toMap(Identified::accession, Coding::cdsCoordinates));
@@ -169,7 +179,9 @@ public class RefseqParserTest {
             assertThat(surf2.id().ncbiGeneId().get(), equalTo("NCBIGene:6835"));
 
             // Metadata
-            assertThat(surf2.refseqMetadata().biotype(), equalTo(Biotype.protein_coding));
+            assertThat(surf2.biotype(), equalTo(Biotype.protein_coding));
+            assertThat(surf2.featureSource().isPresent(), equalTo(true));
+            assertThat(surf2.featureSource().get(), equalTo(FeatureSource.REFSEQ));
 
             // Transcripts
             assertThat(surf2.transcriptCount(), equalTo(2));
@@ -184,6 +196,10 @@ public class RefseqParserTest {
             assertThat(first.id().ccdsId().isPresent(), equalTo(false));
             assertThat(first.location(), equalTo(GenomicRegion.of(GRCH37.contigByName("9"), Strand.POSITIVE, CoordinateSystem.zeroBased(), 136_223_425, 136_228_034)));
             assertThat(first.exons().size(), equalTo(6));
+            assertThat(first.evidence().isPresent(), equalTo(true));
+            assertThat(first.evidence().get(), equalTo(TranscriptEvidence.KNOWN));
+            assertThat(first.featureSource().isPresent(), equalTo(true));
+            assertThat(first.featureSource().get(), equalTo(FeatureSource.REFSEQ));
             assertThat(first.biotype(), equalTo(Biotype.protein_coding));
             assertThat(first.source(), equalTo(RefseqSource.BestRefSeq));
 
@@ -199,6 +215,10 @@ public class RefseqParserTest {
             assertThat(second.id().ccdsId().isPresent(), equalTo(false));
             assertThat(second.location(), equalTo(GenomicRegion.of(GRCH37.contigByName("9"), Strand.POSITIVE, CoordinateSystem.zeroBased(), 136_223_425, 136_228_034)));
             assertThat(second.exons().size(), equalTo(6));
+            assertThat(second.evidence().isPresent(), equalTo(true));
+            assertThat(second.evidence().get(), equalTo(TranscriptEvidence.KNOWN));
+            assertThat(second.featureSource().isPresent(), equalTo(true));
+            assertThat(second.featureSource().get(), equalTo(FeatureSource.REFSEQ));
             assertThat(second.biotype(), equalTo(Biotype.protein_coding));
             assertThat(second.source(), equalTo(RefseqSource.BestRefSeq));
 

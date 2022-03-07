@@ -1,15 +1,22 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.refseq;
 
 import org.monarchinitiative.sgenes.gtf.model.Biotype;
-import org.monarchinitiative.sgenes.gtf.model.RefseqMetadata;
+import org.monarchinitiative.sgenes.gtf.model.RefseqTranscriptMetadata;
+import org.monarchinitiative.sgenes.model.TranscriptEvidence;
+import org.monarchinitiative.sgenes.model.base.BaseTranscriptMetadata;
 
 import java.util.Objects;
 
-public class RefseqMetadataImpl implements RefseqMetadata {
+public class RefseqTranscriptTranscriptMetadataImpl extends BaseTranscriptMetadata implements RefseqTranscriptMetadata {
 
     private final Biotype biotype;
 
-    RefseqMetadataImpl(Biotype biotype) {
+    public static RefseqTranscriptTranscriptMetadataImpl of(TranscriptEvidence evidence, Biotype biotype) {
+        return new RefseqTranscriptTranscriptMetadataImpl(evidence, biotype);
+    }
+
+    private RefseqTranscriptTranscriptMetadataImpl(TranscriptEvidence evidence, Biotype biotype) {
+        super(evidence);
         this.biotype = Objects.requireNonNull(biotype, "Biotype must not be null");
     }
 
@@ -27,7 +34,7 @@ public class RefseqMetadataImpl implements RefseqMetadata {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RefseqMetadataImpl that = (RefseqMetadataImpl) o;
+        RefseqTranscriptTranscriptMetadataImpl that = (RefseqTranscriptTranscriptMetadataImpl) o;
         return biotype == that.biotype;
     }
 
@@ -36,9 +43,5 @@ public class RefseqMetadataImpl implements RefseqMetadata {
         return "RefseqMetadataImpl{" +
                 "biotype=" + biotype +
                 '}';
-    }
-
-    public static RefseqMetadataImpl of(Biotype biotype) {
-        return new RefseqMetadataImpl(biotype);
     }
 }

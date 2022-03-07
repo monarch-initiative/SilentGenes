@@ -3,8 +3,6 @@ package org.monarchinitiative.sgenes.io.json;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.sgenes.io.GeneParserTestBase;
-import org.monarchinitiative.svart.assembly.GenomicAssemblies;
-import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.sgenes.model.Gene;
 import org.monarchinitiative.sgenes.simple.Genes;
 
@@ -52,7 +50,7 @@ public class JsonGeneParserTest extends GeneParserTestBase {
         List<Gene> genes = List.of(Genes.surf1(), Genes.surf2());
         JsonGeneParser parser = JsonGeneParser.of(ASSEMBLY);
 
-        Path path = Paths.get("src/test/resources/xyz/ielis/silent/genes/io/json/test-surf1_surf2.json");
+        Path path = Paths.get("src/test/resources/org/monarchinitiative/sgenes/io/json/test-surf1_surf2.json");
         try (OutputStream os = Files.newOutputStream(path)) {
             parser.write(genes, os);
         }

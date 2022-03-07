@@ -1,6 +1,6 @@
 package org.monarchinitiative.sgenes.gtf.model.impl.gencode;
 
-import org.monarchinitiative.sgenes.gtf.model.GencodeMetadata;
+import org.monarchinitiative.sgenes.gtf.model.GencodeTranscriptMetadata;
 import org.monarchinitiative.sgenes.model.CodingTranscript;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
@@ -17,16 +17,16 @@ public class GencodeCodingTranscript extends GencodeNoncodingTranscript implemen
                                              GenomicRegion location,
                                              List<Coordinates> exons,
                                              Coordinates cdsCoordinates,
-                                             GencodeMetadata gencodeMetadata) {
-        return new GencodeCodingTranscript(id, location, exons, cdsCoordinates, gencodeMetadata);
+                                             GencodeTranscriptMetadata metadata) {
+        return new GencodeCodingTranscript(id, location, exons, cdsCoordinates, metadata);
     }
 
     private GencodeCodingTranscript(TranscriptIdentifier id,
                                     GenomicRegion location,
                                     List<Coordinates> exons,
                                     Coordinates cdsCoordinates,
-                                    GencodeMetadata gencodeMetadata) {
-        super(id, location, exons, gencodeMetadata);
+                                    GencodeTranscriptMetadata metadata) {
+        super(id, location, exons, metadata);
         this.cdsCoordinates = Objects.requireNonNull(cdsCoordinates, "CDS coordinates must not be null");
     }
 
@@ -54,10 +54,10 @@ public class GencodeCodingTranscript extends GencodeNoncodingTranscript implemen
     public String toString() {
         return "GencodeCodingTranscript{" +
                 "id=" + id() +
+                ", metadata=" + metadata() +
                 ", location=" + location() +
                 ", exons=" + exons() +
                 ", cdsCoordinates=" + cdsCoordinates +
-                ", gencodeMetadata=" + gencodeMetadata() +
                 "}";
     }
 }

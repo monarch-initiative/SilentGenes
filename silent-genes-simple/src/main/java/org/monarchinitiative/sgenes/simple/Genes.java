@@ -1,12 +1,9 @@
 package org.monarchinitiative.sgenes.simple;
 
+import org.monarchinitiative.sgenes.model.*;
 import org.monarchinitiative.svart.*;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
-import org.monarchinitiative.sgenes.model.Gene;
-import org.monarchinitiative.sgenes.model.GeneIdentifier;
-import org.monarchinitiative.sgenes.model.Transcript;
-import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 
 import java.util.List;
 
@@ -42,7 +39,7 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_361_055, 133_361_158)
         );
 
-        return Transcript.of(txId, location, exons, location.coordinates());
+        return Transcript.of(txId, location, exons, location.coordinates(), TranscriptMetadata.of(TranscriptEvidence.MANUAL_ANNOTATION));
     }
 
     // ------------------------------------------------- FBN1 ----------------------------------------------------------
@@ -74,7 +71,7 @@ public class Genes {
                 Coordinates.of(CoordinateSystem.zeroBased(), 133_351_757, 133_351_982).invert(contig)
                 );
         Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_356_453).invert(contig);
-        return Transcript.of(txId, location, exons, cdsCoordinates);
+        return Transcript.of(txId, location, exons, cdsCoordinates, TranscriptMetadata.of(TranscriptEvidence.MANUAL_ANNOTATION));
     }
 
     public static Transcript surf1_205(Contig contig) {
@@ -93,7 +90,7 @@ public class Genes {
 
         Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 133_351_912, 133_353_936).invert(contig);
 
-        return Transcript.of(txId, location, exons, cdsCoordinates);
+        return Transcript.of(txId, location, exons, cdsCoordinates, TranscriptMetadata.of(TranscriptEvidence.AUTOMATED_ANNOTATION));
     }
 
 }

@@ -65,17 +65,15 @@ public class CodingTranscriptTest {
 
 
         private CodingTranscript getTranscript(Contig contig){
-            TranscriptIdentifier txId = TranscriptIdentifier.of("ENST00000504937.5", "TP53",
-                    "CCDS73967.1");
-            GenomicRegion location = GenomicRegion.of(contig, Strand.POSITIVE, CoordinateSystem.zeroBased(),
-                    0, 500);
+            TranscriptIdentifier txId = TranscriptIdentifier.of("ENST00000504937.5", "TP53", "CCDS73967.1");
+            GenomicRegion location = GenomicRegion.of(contig, Strand.POSITIVE, CoordinateSystem.zeroBased(), 0, 500);
             List<Coordinates> exons = List.of(
                     Coordinates.of(CoordinateSystem.zeroBased(), 0, 100),
                     Coordinates.of(CoordinateSystem.zeroBased(), 175, 275),
                     Coordinates.of(CoordinateSystem.zeroBased(), 300, 500)
             );
             Coordinates cdsCoordinates = Coordinates.of(CoordinateSystem.zeroBased(), 177, 270);
-            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates);
+            return (CodingTranscript) Transcript.of(txId, location, exons, cdsCoordinates, TranscriptMetadata.of(TranscriptEvidence.MANUAL_ANNOTATION));
         }
     }
 

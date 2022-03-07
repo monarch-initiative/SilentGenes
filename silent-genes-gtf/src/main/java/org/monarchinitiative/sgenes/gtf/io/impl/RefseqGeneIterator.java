@@ -5,8 +5,9 @@ import org.monarchinitiative.sgenes.gtf.io.gtf.GtfSource;
 import org.monarchinitiative.sgenes.gtf.model.*;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqGeneIdentifier;
 import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqGeneImpl;
-import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqMetadataImpl;
+import org.monarchinitiative.sgenes.gtf.model.impl.refseq.RefseqTranscriptTranscriptMetadataImpl;
 import org.monarchinitiative.sgenes.model.GeneIdentifier;
+import org.monarchinitiative.sgenes.model.TranscriptEvidence;
 import org.monarchinitiative.sgenes.model.TranscriptIdentifier;
 import org.monarchinitiative.svart.Coordinates;
 import org.monarchinitiative.svart.GenomicRegion;
@@ -19,7 +20,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, RefseqTranscript> {
+class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, Biotype, RefseqTranscript> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RefseqGeneIterator.class);
     public static final Set<String> MANDATORY_TRANSCRIPT_ATTRIBUTES = Set.of();
@@ -68,14 +69,14 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Re
     }
 
     @Override
-    protected Optional<RefseqMetadata> parseGeneMetadata(String geneId, GtfRecord gene) {
+    protected Optional<Biotype> parseGeneMetadata(String geneId, GtfRecord gene) {
         String biotypeString = gene.firstAttribute("gene_biotype");
         Optional<Biotype> biotype = parseBiotype(biotypeString);
         if (biotype.isEmpty()) {
             LOGGER.warn("Unable to parse biotype level `{}` for gene `{}`", biotypeString, geneId);
             return Optional.empty();
         }
-        return Optional.of(RefseqMetadataImpl.of(biotype.get()));
+        return biotype;
     }
 
     @Override
@@ -93,7 +94,7 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Re
 
         TranscriptIdentifier txIdentifier = TranscriptIdentifier.of(txId, txSymbol.get(), null);
 
-        Optional<RefseqMetadata> metadata = parseTranscriptMetadata(tx);
+        Optional<RefseqTranscriptMetadata> metadata = parseTranscriptMetadata(tx);
         if (metadata.isEmpty())
             return Optional.empty();
 
@@ -130,9 +131,25 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Re
         return Optional.ofNullable(txSymbol);
     }
 
-    private static Optional<RefseqMetadata> parseTranscriptMetadata(GtfRecord tx) {
-        return parseBiotype(tx.firstAttribute("transcript_biotype"))
-                .map(RefseqMetadataImpl::of);
+    private static Optional<RefseqTranscriptMetadata> parseTranscriptMetadata(GtfRecord tx) {
+        Optional<Biotype> biotype = parseBiotype(tx.firstAttribute("transcript_biotype"));
+
+        if (biotype.isPresent()) {
+            TranscriptEvidence evidence = parseTranscriptEvidence(tx);
+            return Optional.of(RefseqTranscriptTranscriptMetadataImpl.of(evidence, biotype.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static TranscriptEvidence parseTranscriptEvidence(GtfRecord tx) {
+        String txId = tx.firstAttribute("transcript_id");
+        if (txId.startsWith("NM_") || txId.startsWith("NR_"))
+            return TranscriptEvidence.KNOWN;
+        else if (txId.startsWith("XM_") || txId.startsWith("XR_"))
+            return TranscriptEvidence.MODEL;
+        LOGGER.warn("Cannot infer TranscriptEvidence value for transcript `{}`", txId);
+        return null;
     }
 
     private static Optional<RefseqSource> parseRefseqSource(GtfSource source) {
@@ -156,11 +173,11 @@ class RefseqGeneIterator extends BaseGeneIterator<RefseqGene, RefseqMetadata, Re
     protected RefseqGene newGeneInstance(GeneIdentifier geneIdentifier,
                                          GenomicRegion location,
                                          List<RefseqTranscript> transcripts,
-                                         RefseqMetadata refseqMetadata) {
+                                         Biotype biotype) {
         return RefseqGeneImpl.of(geneIdentifier,
                 location,
                 transcripts,
-                refseqMetadata);
+                biotype);
     }
 
 }

@@ -27,6 +27,7 @@ public class TranscriptSerializer extends StdSerializer<Transcript> {
 
         gen.writeObjectField("id", tx.id());
         gen.writeObjectField("loc", tx.location());
+        gen.writeObjectField("metadata", tx.metadata());
         gen.writeArrayFieldStart("exons");
         for (Coordinates exon : tx.exons()) {
             gen.writeObject(exon);
