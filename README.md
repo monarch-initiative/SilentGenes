@@ -58,18 +58,34 @@ First, get the latest GTF file from [Gencode downloads](https://www.gencodegenes
 wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.basic.annotation.gtf.gz
 ```
 
-Next, run something like this to read the GTF file into a list of `GencodeGene`s: 
+Next, read the GTF file into a list of `GencodeGene`s: 
 ```java
 @Test
-public void parseGtfFile() {
+public void parseGencodeGtfFile() {
     Path gencodeGtf = Path.of("gencode.v38.basic.annotation.gtf.gz");
-    GencodeParser gencodeParser = new GencodeParser(gencodeGtf, GenomicAssemblies.GRCh38p13());
+    GtfGeneParser<GencodeGene> gencodeParser = GtfGeneParserFactory.gencodeGeneParser(gencodeGtf, GenomicAssemblies.GRCh38p13());
     List<GencodeGene> genes = gencodeParser.stream().collect(Collectors.toUnmodifiableList());
     
     assertThat(genes, hasSize(63_116));
 }
 ```
 
+### Parse RefSeq GTF file into a list of genes
+
+Get the latest GTF file from [RefSeq downloads](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Homo_sapiens/annotation_releases):
+```bash
+wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Homo_sapiens/annotation_releases/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.gtf.gz
+```
+
+Next, read the GTF file into a list of `RefseqGene`s:
+```java
+@Test
+public void parseRefseqGtfFile() {
+    Path refseqGtf = Path.of("GCF_000001405.39_GRCh38.p13_genomic.gtf.gz");
+    GtfGeneParser<RefseqGene> refseqParser = GtfGeneParserFactory.refseqGtfParser(refseqGtf, GenomicAssemblies.GRCh38p13());
+    List<RefseqGene> genes = refseqParser.stream().collect(Collectors.toUnmodifiableList());
+}
+```
 
 ### Serialize genes into compressed JSON
 
@@ -79,12 +95,12 @@ format is supported.
 ```java
 @Test
 public void serializeGenesIntoCompressedJson() {
-    List<Gene> genes = ... ; // start with a list of genes, e.g. from the example above
+    List<? extends Gene> genes = ... ; // start with a list of genes, e.g. from the example above
     GeneParserFactory factory = GeneParserFactory.of(GenomicAssemblies.GRCh38p13());
     GeneParser parser = factory.forFormat(SerializationFormat.JSON);
 
-    try (OutputStream os = new BufferedOutputStream(new GzipCompressorOutputStream(new FileOutputStream("genes.json.gz")))) {
-        parser.write(genes, os);
+    Path destination = Path.of("genes.json.gz");
+    parser.write(genes, destination);
     }
 }
 ```
@@ -98,13 +114,10 @@ Load the list of genes from the JSON file created above.
 ```java
 @Test
 public void deserializeGenes() {
-    Path jsonPath = Path.of("genes.json.gz");
     GeneParserFactory factory = GeneParserFactory.of(GenomicAssemblies.GRCh38p13());
     GeneParser parser = factory.forFormat(SerializationFormat.JSON);
 
-    List<? extends Gene> genes;
-    try (InputStream is = new BufferedInputStream(new GZIPInputStream(Files.newInputStream(jsonPath)))) {
-        genes = parser.read(is);
-    }
+    Path jsonPath = Path.of("genes.json.gz");
+    List<? extends Gene> genes = parser.read(jsonPath);
 }
 ```
