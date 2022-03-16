@@ -13,7 +13,6 @@ public class JannovarIterator implements Iterator<Gene> {
 
     // Jannovar stores coordinates in 0-based system
     private static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.zeroBased();
-    private static final String NCBI_GENE_ID_IS_NA = null; // not available in Jannovar databases
     private final Iterator<Map.Entry<String, Collection<TranscriptModel>>> iterator;
     private final GenomicAssembly assembly;
 
@@ -55,16 +54,9 @@ public class JannovarIterator implements Iterator<Gene> {
             return null; // no transcripts defined for the gene
 
         TranscriptModel first = transcripts.iterator().next();
-        Map<String, String> altGeneIds = first.getAltGeneIDs();
-        String geneId = altGeneIds.get("ENSEMBL_GENE_ID");
-        if (geneId == null)
-            geneId = altGeneIds.get("HGNC_ID");
-        if (geneId == null)
+        Optional<GeneIdentifier> id = createGeneIdentifier(entry.getKey(), transcripts);
+        if (id.isEmpty())
             return null; // no proper gene accession is available
-
-        String symbol = entry.getKey();
-
-        GeneIdentifier id = GeneIdentifier.of(geneId, symbol, altGeneIds.get("HGNC_ID"), NCBI_GENE_ID_IS_NA);
 
         GenomeInterval txInterval = first.getTXRegion();
         String contigName = txInterval.getRefDict().getContigIDToName().get(txInterval.getChr());
@@ -76,7 +68,38 @@ public class JannovarIterator implements Iterator<Gene> {
         GenomicRegion location = parseLocation(contig, strand, transcripts);
         List<? extends Transcript> txs = parseTranscripts(contig, strand, transcripts);
 
-        return Gene.of(id, location, txs);
+        return Gene.of(id.get(), location, txs);
+    }
+
+    private static Optional<GeneIdentifier> createGeneIdentifier(String symbol, Collection<TranscriptModel> transcripts) {
+        String geneId = null, hgncId = null, ncbiGeneId = null;
+        for (TranscriptModel tx : transcripts) {
+            Map<String, String> altGeneIDs = tx.getAltGeneIDs();
+
+            // 1 - geneId
+            if (geneId == null) {
+                geneId = altGeneIDs.get("ENSEMBL_GENE_ID");
+                if (geneId == null)
+                    geneId = altGeneIDs.get("HGNC_ID");
+            }
+
+            // 2 - hgncId
+            if (hgncId == null)
+                hgncId = altGeneIDs.get("HGNC_ID");
+
+            // 3 - ncbiGeneId
+            if (ncbiGeneId == null) {
+                String entrezId = altGeneIDs.get("ENTREZ_ID"); // NCBIGene is numerically identical to ENTREZ id
+                ncbiGeneId = entrezId == null ? null : "NCBIGene:" + entrezId;
+            }
+
+            // ------------------------------------------------------------------------------------------------------ //
+            if (geneId != null && hgncId != null && ncbiGeneId != null)
+                return Optional.of(GeneIdentifier.of(geneId, symbol, hgncId, ncbiGeneId));
+        }
+        return geneId == null // Mandatory field is missing. Symbol should always be present
+                ? Optional.empty()
+                : Optional.of(GeneIdentifier.of(geneId, symbol, hgncId, ncbiGeneId));
     }
 
     private static List<? extends Transcript> parseTranscripts(Contig contig, Strand strand, Collection<TranscriptModel> transcripts) {
