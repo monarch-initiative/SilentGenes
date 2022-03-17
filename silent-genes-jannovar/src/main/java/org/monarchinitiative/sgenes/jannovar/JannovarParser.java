@@ -17,18 +17,16 @@ public class JannovarParser implements Iterable<Gene> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JannovarParser.class);
 
-    private static final List<Gene> EMPTY_GENE_LIST = List.of();
-
     private final JannovarData jannovarData;
     private final GenomicAssembly assembly;
 
-    private JannovarParser(Path jannovarCachePath, GenomicAssembly assembly) {
-        this.jannovarData = openJannovarCache(Objects.requireNonNull(jannovarCachePath, "Path to Jannovar cache must not be null"));
-        this.assembly = Objects.requireNonNull(assembly, "Assembly must not be null");
+    public static JannovarParser of(Path jannovarCachePath, GenomicAssembly assembly) {
+        JannovarData jannovarData = openJannovarCache(Objects.requireNonNull(jannovarCachePath, "Path to Jannovar cache must not be null"));
+        return of(jannovarData, assembly);
     }
 
-    public static JannovarParser of(Path jannovarCachePath, GenomicAssembly assembly) {
-        return new JannovarParser(jannovarCachePath, assembly);
+    public static JannovarParser of(JannovarData jannovarData, GenomicAssembly assembly) {
+        return new JannovarParser(jannovarData, assembly);
     }
 
     private static JannovarData openJannovarCache(Path jannovarCachePath) {
@@ -40,12 +38,14 @@ public class JannovarParser implements Iterable<Gene> {
         }
     }
 
+    private JannovarParser(JannovarData jannovarData, GenomicAssembly assembly) {
+        this.jannovarData = Objects.requireNonNull(jannovarData, "Jannovar data must not be null");
+        this.assembly = Objects.requireNonNull(assembly, "Assembly must not be null");
+    }
+
     @Override
     public Iterator<Gene> iterator() {
-        if (jannovarData == null)
-            return EMPTY_GENE_LIST.iterator();
-        else
-            return new JannovarIterator(jannovarData, assembly);
+        return new JannovarIterator(jannovarData, assembly);
     }
 
     public Stream<Gene> stream() {

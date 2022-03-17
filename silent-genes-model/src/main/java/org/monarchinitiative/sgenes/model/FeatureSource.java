@@ -11,5 +11,9 @@ public enum FeatureSource {
     /**
      * <a href="https://www.ncbi.nlm.nih.gov/refseq/">RefSeq project</a>.
      */
-    REFSEQ
+    REFSEQ,
+    /**
+     * <a href="https://hgdownload.soe.ucsc.edu/goldenPath">UC Santa Cruz transcripts</a>
+     */
+    UCSC
 }

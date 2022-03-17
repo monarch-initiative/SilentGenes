@@ -36,7 +36,14 @@ public enum TranscriptEvidence {
     /**
      * Ensembl loci where they are different from the Havana annotation or where no Havana annotation can be found.
      */
-    AUTOMATED_ANNOTATION(FeatureSource.GENCODE);
+    AUTOMATED_ANNOTATION(FeatureSource.GENCODE),
+
+    // ******************************************* UCSC Evidence **************************************************** //
+
+    /**
+     * Annotated as canonical transcript by UCSC.
+     */
+    CANONICAL(FeatureSource.UCSC);
 
     // ************************************************************************************************************** //
 
