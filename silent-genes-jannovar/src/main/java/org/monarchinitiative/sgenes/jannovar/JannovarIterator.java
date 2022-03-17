@@ -9,7 +9,7 @@ import org.monarchinitiative.svart.*;
 
 import java.util.*;
 
-public class JannovarIterator implements Iterator<Gene> {
+class JannovarIterator implements Iterator<Gene> {
 
     // Jannovar stores coordinates in 0-based system
     private static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.zeroBased();
