@@ -6,13 +6,22 @@ import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.monarchinitiative.sgenes.model.*;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.monarchinitiative.svart.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class JannovarIterator implements Iterator<Gene> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JannovarIterator.class);
+
     // Jannovar stores coordinates in 0-based system
     private static final CoordinateSystem COORDINATE_SYSTEM = CoordinateSystem.zeroBased();
+    private static final Pattern REFSEQ_TX = Pattern.compile("(?<prefix>[NX][MR])_(?<value>\\d+)\\.(?<version>\\d+)");
+    private static final Pattern ENSEMBL_TX = Pattern.compile("(?<prefix>ENST)(?<value>\\d{11})\\.(?<version>\\d+)");
+    private static final Pattern UCSC_TX = Pattern.compile("(?<prefix>uc)(?<value>\\d{3})(?<suffix>\\w{3})\\.(?<version>\\d+)");
     private final Iterator<Map.Entry<String, Collection<TranscriptModel>>> iterator;
     private final GenomicAssembly assembly;
 
@@ -106,9 +115,9 @@ class JannovarIterator implements Iterator<Gene> {
         List<Transcript> txs = new ArrayList<>(transcripts.size());
 
         for (TranscriptModel tx : transcripts) {
-            // Symbol is not transferred, nor is ccdsId
-            TranscriptIdentifier txId = TranscriptIdentifier.of(tx.getAccession(), "", null);
-            TranscriptMetadata metadata = TranscriptMetadata.of(parseTranscriptSupportLevel(tx.getTranscriptSupportLevel()));
+            // We use accession as transcript symbol. CCDS info is present as e.g. `CCDS75928|CCDS6966`, and it is impossible to map it to the respective transcripts
+            TranscriptIdentifier txId = TranscriptIdentifier.of(tx.getAccession(), tx.getAccession(), null);
+            TranscriptMetadata metadata = TranscriptMetadata.of(parseTranscriptEvidence(tx.getAccession(), tx.getTranscriptSupportLevel()));
             if (tx.isCoding()) {
                 txs.add(parseCodingTranscript(contig, strand, txId, metadata, tx));
             } else {
@@ -119,9 +128,60 @@ class JannovarIterator implements Iterator<Gene> {
         return Collections.unmodifiableList(txs);
     }
 
-    private static TranscriptEvidence parseTranscriptSupportLevel(int transcriptSupportLevel) {
-        // TODO - implement a proper parse
+    private static TranscriptEvidence parseTranscriptEvidence(String accession, int transcriptSupportLevel) {
+        Matcher refseqMatcher = REFSEQ_TX.matcher(accession);
+        if (refseqMatcher.matches()) {
+            String prefix = refseqMatcher.group("prefix");
+            switch (prefix.toUpperCase()) {
+                case "NM":
+                case "NR":
+                    return TranscriptEvidence.KNOWN;
+                case "XM":
+                case "XR":
+                    return TranscriptEvidence.MODEL;
+            }
+        }
+
+        Matcher ensemblMatcher = ENSEMBL_TX.matcher(accession);
+        if (ensemblMatcher.matches()) {
+            // There is currently no way to deduce TranscriptEvidence from the accession. We can use TSL though
+            return parseTranscriptSupportLevel(transcriptSupportLevel);
+        }
+
+        Matcher ucscMatcher = UCSC_TX.matcher(accession);
+        if (ucscMatcher.matches()) {
+            return parseTranscriptSupportLevel(transcriptSupportLevel);
+        }
+
+        LOGGER.warn("Unparsable transcript accession `{}`", accession);
         return null;
+    }
+
+    private static TranscriptEvidence parseTranscriptSupportLevel(int transcriptSupportLevel) {
+        switch (transcriptSupportLevel) {
+            case -1:
+                /*
+                 * the transcript was not analyzed for one of the following reasons:
+                 *
+                 * <ul>
+                 * <li>pseudogene annotation, including transcribed pseudogenes</li>
+                 * <li>human leukocyte antigen (HLA) transcript</li>
+                 * <li>immunoglobin gene transcript</li>
+                 * <li>T-cell receptor transcript</li>
+                 * <li>single-exon transcript (will be included in a future version)</li>
+                 * </ul>
+                 */
+                return null;
+            case 6:
+                // Annotated as canonical transcript by UCSC (used in absence of TSL).
+                return TranscriptEvidence.CANONICAL;
+            case 8:
+                // Lowest available priority (used in absence of any TSL and UCSC annotation of this transcript).
+                return null;
+            default:
+                LOGGER.warn("Unexpected transcript support level {}", transcriptSupportLevel);
+                return null;
+        }
     }
 
     private static Transcript parseCodingTranscript(Contig contig, Strand strand, TranscriptIdentifier txId, TranscriptMetadata metadata, TranscriptModel tx) {
