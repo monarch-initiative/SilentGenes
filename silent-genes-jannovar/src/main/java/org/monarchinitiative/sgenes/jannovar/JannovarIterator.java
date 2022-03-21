@@ -1,6 +1,7 @@
 package org.monarchinitiative.sgenes.jannovar;
 
 import de.charite.compbio.jannovar.data.JannovarData;
+import de.charite.compbio.jannovar.data.ReferenceDictionary;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.monarchinitiative.sgenes.model.*;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 class JannovarIterator implements Iterator<Gene> {
 
@@ -22,16 +24,19 @@ class JannovarIterator implements Iterator<Gene> {
     private static final Pattern REFSEQ_TX = Pattern.compile("(?<prefix>[NX][MR])_(?<value>\\d+)\\.(?<version>\\d+)");
     private static final Pattern ENSEMBL_TX = Pattern.compile("(?<prefix>ENST)(?<value>\\d{11})\\.(?<version>\\d+)");
     private static final Pattern UCSC_TX = Pattern.compile("(?<prefix>uc)(?<value>\\d{3})(?<suffix>\\w{3})\\.(?<version>\\d+)");
+
+    private final ReferenceDictionary rd;
     private final Iterator<Map.Entry<String, Collection<TranscriptModel>>> iterator;
     private final GenomicAssembly assembly;
 
-    private Gene next;
+    private final Queue<Gene> genes = new LinkedList<>();
 
     JannovarIterator(JannovarData jannovarData, GenomicAssembly assembly) {
         this.assembly = assembly;
+        this.rd = jannovarData.getRefDict();
         Map<String, Collection<TranscriptModel>> geneMap = jannovarData.getTmByGeneSymbol().asMap();
         iterator = geneMap.entrySet().iterator();
-        next = parseGene();
+        readNextGenes();
     }
 
     private static Strand parseStrand(de.charite.compbio.jannovar.reference.Strand strand) {
@@ -45,39 +50,71 @@ class JannovarIterator implements Iterator<Gene> {
         }
     }
 
-    private static GenomicRegion parseLocation(Contig contig, Strand strand, Collection<TranscriptModel> transcripts) {
+    private static Optional<GenomicRegion> parseLocation(Contig contig, Collection<TranscriptModel> transcripts) {
         int start = contig.length(), end = 0;
 
+        if (transcripts.isEmpty())
+            return Optional.empty();
+
+        Strand st = null;
         for (TranscriptModel tx : transcripts) {
             GenomeInterval txRegion = tx.getTXRegion();
             start = Math.min(start, txRegion.getBeginPos());
             end = Math.max(end, txRegion.getEndPos());
+            Strand currentStrand = parseStrand(tx.getStrand());
+            if (st == null) {
+                st = currentStrand;
+            } else {
+                if (!st.equals(currentStrand)) {
+                    return Optional.empty();
+                }
+            }
         }
 
-        return GenomicRegion.of(contig, strand, COORDINATE_SYSTEM, start, end);
+        return Optional.of(GenomicRegion.of(contig, st, COORDINATE_SYSTEM, start, end));
     }
 
-    private static Gene parseNextGene(GenomicAssembly assembly, Map.Entry<String, Collection<TranscriptModel>> entry) {
-        Collection<TranscriptModel> transcripts = entry.getValue();
-        if (transcripts.isEmpty())
-            return null; // no transcripts defined for the gene
+    /**
+     * We parse a collection of transcripts into more than one gene because of the genes that are in the pseudo-autosomal
+     * regions
+     */
+    private static Collection<Gene> parseNextGene(GenomicAssembly assembly,
+                                                  ReferenceDictionary rd,
+                                                  String hgvsGeneSymbol,
+                                                  Collection<TranscriptModel> transcripts) {
+        Map<Integer, List<TranscriptModel>> txsByContig = transcripts.stream()
+                .collect(Collectors.groupingBy(TranscriptModel::getChr));
 
-        TranscriptModel first = transcripts.iterator().next();
-        Optional<GeneIdentifier> id = createGeneIdentifier(entry.getKey(), transcripts);
-        if (id.isEmpty())
-            return null; // no proper gene accession is available
+        List<Gene> genes = new ArrayList<>(txsByContig.size());
+        for (Map.Entry<Integer, List<TranscriptModel>> entry : txsByContig.entrySet()) {
+            Integer contigId = entry.getKey();
+            List<TranscriptModel> txs = entry.getValue();
 
-        GenomeInterval txInterval = first.getTXRegion();
-        String contigName = txInterval.getRefDict().getContigIDToName().get(txInterval.getChr());
-        Contig contig = assembly.contigByName(contigName);
-        if (contig.isUnknown())
-            return null; // unknown contig
+            Optional<GeneIdentifier> id = createGeneIdentifier(hgvsGeneSymbol, txs);
+            if (id.isEmpty()) {
+                LOGGER.debug("No proper gene accession is available for gene `{}`", hgvsGeneSymbol);
+                continue;
+            }
 
-        Strand strand = parseStrand(txInterval.getStrand());
-        GenomicRegion location = parseLocation(contig, strand, transcripts);
-        List<? extends Transcript> txs = parseTranscripts(contig, strand, transcripts);
+            String contigName = rd.getContigIDToName().get(contigId);
+            Contig contig = assembly.contigByName(contigName);
+            if (contig.isUnknown()) {
+                LOGGER.debug("Unknown contig {}({}) for gene `{}`", contigName, contigId, hgvsGeneSymbol);
+                continue;
+            }
 
-        return Gene.of(id.get(), location, txs);
+            Optional<GenomicRegion> location = parseLocation(contig, txs);
+            if (location.isEmpty()) {
+                LOGGER.debug("Transcripts of {} are located on multiple strands", hgvsGeneSymbol);
+                continue;
+            }
+            List<? extends Transcript> parsedTxs = parseTranscripts(contig, txs);
+
+            Gene gene = Gene.of(id.get(), location.get(), parsedTxs);
+            genes.add(gene);
+        }
+
+        return genes;
     }
 
     private static Optional<GeneIdentifier> createGeneIdentifier(String symbol, Collection<TranscriptModel> transcripts) {
@@ -111,11 +148,12 @@ class JannovarIterator implements Iterator<Gene> {
                 : Optional.of(GeneIdentifier.of(geneId, symbol, hgncId, ncbiGeneId));
     }
 
-    private static List<? extends Transcript> parseTranscripts(Contig contig, Strand strand, Collection<TranscriptModel> transcripts) {
+    private static List<? extends Transcript> parseTranscripts(Contig contig, Collection<TranscriptModel> transcripts) {
         List<Transcript> txs = new ArrayList<>(transcripts.size());
 
         for (TranscriptModel tx : transcripts) {
             // We use accession as transcript symbol. CCDS info is present as e.g. `CCDS75928|CCDS6966`, and it is impossible to map it to the respective transcripts
+            Strand strand = parseStrand(tx.getStrand());
             TranscriptIdentifier txId = TranscriptIdentifier.of(tx.getAccession(), tx.getAccession(), null);
             TranscriptMetadata metadata = TranscriptMetadata.of(parseTranscriptEvidence(tx.getAccession(), tx.getTranscriptSupportLevel()));
             if (tx.isCoding()) {
@@ -153,7 +191,6 @@ class JannovarIterator implements Iterator<Gene> {
             return parseTranscriptSupportLevel(transcriptSupportLevel);
         }
 
-        LOGGER.warn("Unparsable transcript accession `{}`", accession);
         return null;
     }
 
@@ -211,25 +248,26 @@ class JannovarIterator implements Iterator<Gene> {
         return exons;
     }
 
-    private Gene parseGene() {
-        Gene gene = null;
-        while (iterator.hasNext() && gene == null) {
+    private void readNextGenes() {
+        while (iterator.hasNext() && genes.isEmpty()) {
             // Conversion of Jannovar gene can fail and parseNext can return null. Let's make sure this method only
             // returns null when there are no more proper genes left in the cache.
-            gene = parseNextGene(assembly, iterator.next());
+            Map.Entry<String, Collection<TranscriptModel>> entry = iterator.next();
+            genes.addAll(parseNextGene(assembly, rd, entry.getKey(), entry.getValue()));
         }
-        return gene;
     }
 
     @Override
     public boolean hasNext() {
-        return next != null;
+        return !genes.isEmpty();
     }
 
     @Override
     public Gene next() {
-        Gene current = next;
-        next = parseGene();
+        Gene current = genes.poll();
+        if (genes.isEmpty())
+            readNextGenes();
+
         return current;
     }
 
