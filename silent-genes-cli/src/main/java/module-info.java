@@ -3,7 +3,7 @@ module org.monarchinitiative.sgenes.cli {
     requires org.monarchinitiative.sgenes.gtf;
 
     requires info.picocli;
-    requires commons.csv;
+    requires org.apache.commons.csv;
     requires org.slf4j;
 
     opens org.monarchinitiative.sgenes.cli to info.picocli;
