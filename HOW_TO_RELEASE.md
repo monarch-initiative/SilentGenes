@@ -12,4 +12,4 @@
   ```
 - merge the PR and tag the merge commit with the version (e.g. `v0.1.2`)
 - create a GitHub release for the tag, and include the CLI JAR as an asset
-- merge `main` into `development and set SNAPSHOT tags
+- merge `main` into `development` and set SNAPSHOT tags
