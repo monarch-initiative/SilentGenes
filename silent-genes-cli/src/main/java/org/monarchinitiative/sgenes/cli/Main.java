@@ -19,7 +19,7 @@ import static picocli.CommandLine.Help.Ansi.Style.*;
         footer = Main.FOOTER
 )
 public class Main implements Callable<Integer> {
-    public static final String VERSION = "silent-genes-cli v0.2.4";
+    public static final String VERSION = "silent-genes-cli v0.2.5";
 
     public static final int WIDTH = 120;
 
